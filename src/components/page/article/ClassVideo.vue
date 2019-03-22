@@ -305,7 +305,7 @@
             // 查看下一级
             getDown(arr){
                 var filter = {};
-                filter.pageNum   = this.cur_page;
+                filter.pageNum   = 1;
                 filter.pageSize =10;
                 filter.parent_id = arr;
                 this.$ajax.postu(urlA+'/video/videoClassify/getVideoClassifyList', filter).then((res) => {
@@ -331,7 +331,7 @@
             // 返回上一级
             getUp(row){
                 var filter = {};
-                filter.pageNum   = this.cur_page;
+                filter.pageNum   = 1;
                 filter.pageSize =10;
                 if(row.level=='2'){
                    filter.parent_id = 0;

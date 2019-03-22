@@ -21,8 +21,8 @@
                 <el-table-column prop="journal" label="返回信息" align="center"></el-table-column>
                 <el-table-column prop="completeType" label="上传进度" align="center">
                     <template slot-scope="scope">
-                        <span v-if="scope.row.completeType != ''">{{scope.row.completeType}}</span>  
-                        <span v-else>{{scope.row.redisType=='null'?'等待上传':scope.row.redisType}}</span>
+                        <span v-if="scope.row.completeType != ''">{{scope.row.completeType}}%</span>  
+                        <span v-else>{{scope.row.redisType=='null'?'等待上传':scope.row.redisType+'%'}}</span>
                    </template>
                 </el-table-column>
                 <el-table-column  label="来源" align="center">
@@ -35,7 +35,7 @@
                 <el-table-column prop="updateTime" label="上传时间" align="center"></el-table-column>
                 <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
                 <el-table-column label="操作" width="250" align="center">
-                    <template slot-scope="scope" v-if="scope.row.completeType=='100'">
+                    <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -48,6 +48,8 @@
                 :on-preview="handlePreview"
                 :on-remove="handleRemove"
                 :file-list="fileList"
+                :limit="1"
+                :on-exceed="handleExceed"
                 list-type="picture">
                 <el-button size="small" type="primary">点击上传</el-button>
                 <div slot="tip" class="el-upload__tip">上传成功后，请点击保存,可连续上传多个文件</div>
@@ -96,7 +98,9 @@
                 fileList:[],
                 loadAction:url+"/goodsController.api?loadExcel",
                 timer:null,
-                saveLoading:false
+                saveLoading:false,
+                fileIds:'',
+                uploadId:''
             }
         },
         created() {
@@ -108,13 +112,29 @@
         methods: {
             handleRemove(file, fileList) {
                 console.log(file, fileList);
+                this.$ajax.postu(url+'ExcelLogInterfaces.api?delete',{id:this.fileIds,memberId:localStorage.getItem('account_id')}).then((res) => {
+                    if (res.status == "ok") {
+                       this.$message.success('删除成功');
+                       this.delVisible = false;
+                       this.getData();
+                    } else {
+                        this.$message({
+                        message: res.error,
+                        type: 'error'
+                        });
+                    }
+                });
             },
             handlePreview(file) {
                 console.log(file);
+                
+            },
+             handleExceed(files, fileList) {
+                this.$message.warning(`暂只支持上传一个文件`);
             },
              // 上传成功回调
             upload_success:function(response, file, fileList){
-                console.log(file)
+                console.log(fileList)
                 var windowName = "/mnt/disha"+response.data;
                 this.upLoad(windowName,file.name,0)
             },
@@ -144,7 +164,7 @@
                 filter.source = crr;
                 this.$ajax.postu(url+'/goodsController.api?excelloginsert',filter).then((res) => {
                     if (res.status == "ok") {
-                       
+                       this.fileIds = res.data;
                     } else {
                         this.$message({
                         message: res.error,
@@ -156,10 +176,13 @@
            save(){
                 this.saveLoading = true;
                 var filter = {};
+                filter.id = this.fileIds;
+                console.log(this.fileIds)
                 filter.merchants_account_id1 = localStorage.getItem('account_id');
                 this.$ajax.postu(url+"/goodsController.api?loadGoodsDetailExcelNew",filter).then((res) => {
                     this.loadVisible = false;
                     this.saveLoading = false;
+                    this.fileList = [];
                     // if (res.status == "ok") {
                     // this.timer =window.setInterval(this.getData, 1000);
                     // } else {

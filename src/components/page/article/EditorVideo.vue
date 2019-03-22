@@ -115,13 +115,11 @@
             // 获取视频详情
             getDetail() {
                 var filter = {};
-                filter.pageNum  = 1;
-                filter.pageSize =1;
                 filter.video_id = this.id;
-                this.$ajax.postu(urlA+'video/video/getVideoList', filter).then((res) => {
+                this.$ajax.postu(urlA+'video/video/getVideo', filter).then((res) => {
                     if (res.code == "200") {
-                        this.detailDatas = res.data.list[0];
-                        this.addForm =  res.data.list[0];
+                        this.detailDatas = res.data;
+                        this.addForm =  res.data;
                        if(this.detailDatas.level_1!='0'){
                            this.getClass(this.detailDatas.level_1,2);
                            this.level_1 =  this.detailDatas.level_1;
@@ -195,9 +193,9 @@
                         }
                     });
                 }else{
-                    if(this.level_1!=''&&this.level_2!=''){params.classify_id = this.level_2;}
-                    if(this.level_1!=''&&this.level_2==''){params.classify_id = this.level_1;}
-                    if(this.level_1==''&&this.level_2==''){params.classify_id = 0;}
+                    if(this.level_1!=''&&this.level_2!=''){this.addForm.classify_id = this.level_2;}
+                    if(this.level_1!=''&&this.level_2==''){this.addForm.classify_id = this.level_1;}
+                    if(this.level_1==''&&this.level_2==''){this.addForm.classify_id = 0;}
                     if(this.delivery=true){this.addForm.is_check=0;}else{this.addForm.is_check=1;}
                    this.$ajax.postu(urlA+'/video/video/saveVideo',this.addForm).then((res) => {
                         if (res.msg == "success") {

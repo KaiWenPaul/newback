@@ -200,6 +200,13 @@
                         <!--<div style="float:left;height:30px;line-height:30px;width:120px;margin-left:15px;"><a target="_blank" href="http://47.99.133.23:8000/images/desc.docx" class="down">点我下载H5上传说明</a></div>-->
                       
                     </el-form-item>
+                    <el-form-item label="模板背景色">
+                        <el-color-picker
+                            v-model="form.colour"
+                            show-alpha
+                            :predefine="predefineColors">
+                        </el-color-picker>
+                    </el-form-item>
                      <el-form-item label="活动规则描述">
                         <el-input type="textarea" :rows="4" placeholder="请输入活动规则" v-model="form.activityRulesName"></el-input>
                     </el-form-item>
@@ -258,25 +265,7 @@
                 webImage:'', //web端图片
                 webHeadImg:'',//web端顶部图
                 moveHeadImg:'',//移动端顶部图
-                form: {
-                    // name: '',
-                    // typeId:'',
-                    // startTime:'',
-                    // endTime:'',
-                    // timingTime:'',//定时时间
-                    // moveImage:'',//移动端图片
-                    // webImage:'', //web端图片
-                    // activeState:'0',//活动状态
-                    // releaseTo:'0',//发布至
-                    // webUrl:'',
-                    // moveUrl:'4787878',
-                    // webUrlType:'',
-                    // moveUrlType:'',
-                    // activityRulesType:'0',
-                    // activityRulesName:'',
-                    // sort:''
-
-                },
+                form: {},
                 idx: -1,
                 typeList:[],
                 restaurants: [],
@@ -284,6 +273,23 @@
                 restaurants2: [],
                 state3: '',
                 loadImg:imgUrl+"distributor/uploadimg/fileUpload",
+                // 默认背景颜色
+                predefineColors:[
+                    '#2ea4be',
+                    '#ff8c00',
+                    '#ffd700',
+                    '#90ee90',
+                    '#00ced1',
+                    '#1e90ff',
+                    '#c71585',
+                    'rgba(255, 69, 0, 0.68)',
+                    'rgb(255, 120, 0)',
+                    'hsv(51, 100, 98)',
+                    'hsva(120, 40, 94, 0.5)',
+                    'hsl(181, 100%, 37%)',
+                    'hsla(209, 100%, 56%, 0.73)',
+                    '#c7158577'
+                    ]
                
             }
         },
@@ -338,6 +344,7 @@
                 params.activityRulesType = this.form.activityRulesType;
                 params.activityRulesName = this.form.activityRulesName;
                 params.sort = this.form.sort;
+                params.colour = this.form.colour;
                 console.log(params)            
                 this.$ajax.postu(url+"/distributor/tstdistributoraddactivity.api?insert",params).then((res) => {
                     if (res.description == "success") {
@@ -407,9 +414,9 @@
              
             loadAll1() {
                 return [
-                { "value": url+"html/h5/activitys.html","name":"(双十二模板)"},
-                { "value": url+"activity.html#/doing","name":"(解决方案模板)"},
-                { "value": url+"activity.html#/discount","name":"(折扣活动模板)"},
+                { "value": imgUrlB+"html/h5/activitys.html","name":"(双十二模板)"},
+                { "value": imgUrlB+"activity.html#/doing","name":"(解决方案模板)"},
+                { "value": imgUrlB+"activity.html#/discount","name":"(折扣活动模板)"},
                 ];
             },
               loadAll2() {

@@ -54,6 +54,7 @@
                             if (res.status == "ok") {
                               localStorage.setItem('token',res.data.merchants_token);
                               localStorage.setItem('account_id',res.data.merchants_account_id);
+                              localStorage.setItem('account',res.data.merchants_account);
                             //   localStorage.setItem('menus',JSON.stringify(res.data.list));
                               localStorage.setItem('ms_username',res.data.merchants_name);
                               this.$router.push('/dashboard');

@@ -176,7 +176,7 @@ import UE from '../../common/Idtor.vue';
                 filter.pageNum  = this.cur_page;
                 filter.pageSize =10;
                 filter.article_id = this.articleId;
-                filter.name = this.name;
+                filter.title = this.name;
                 this.$ajax.postu(urlA+'/college/article/getArticleList', filter).then((res) => {
                     if (res.msg == "success") {
                        this.tableData = res.data.list;

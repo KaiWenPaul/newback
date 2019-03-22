@@ -49,7 +49,16 @@
             </el-form-item>
             <el-form-item label="当前状态">
                 <el-col :span="5">
-                  <el-switch v-model="delivery"></el-switch>
+                  <!--<el-switch 
+                   active-value="0"
+                   inactive-value="1"
+                  @change="handleSwitch"
+                  v-model="delivery"></el-switch>-->
+                   <el-switch
+                    v-model="addForm.is_check"
+                    active-value="0"
+                    inactive-value="1">
+                </el-switch>
                 </el-col>
             </el-form-item>
             <el-form-item label="可见范围">
@@ -91,7 +100,7 @@
                 <!--<div class="editor-container">
                     <UE :defaultMsg=defaultMsg :config=config ref="ue"></UE>
                  </div>-->
-                  <div>
+                  <div style="width:1000px;">
                     <script id="editor" type="text/plain"></script>
                   </div>
             </el-form-item> 
@@ -127,6 +136,8 @@
                 idx: -1,
                 isAdd:false,
                 delivery:false,
+                switchValue:1,
+                value5:'0',
                 level_1:'',
                 level_2:'',
                 image:'',
@@ -181,32 +192,24 @@
                 this.$ajax.postu(urlA+'college/article/getArticle', filter).then((res) => {
                     if (res.msg == "success") {
                        this.detailDatas = res.data;
-                       this.addForm.article_id =res.data.article_id;
-                       this.addForm.title =res.data.title;
-                       this.addForm.author =res.data.author;
-                       this.addForm.company =res.data.company;
-                       this.addForm.copyright =res.data.copyright;
-                       this.addForm.project_name =res.data.project_name;
-                       this.addForm.keywords =res.data.keywords;
-                       this.addForm.sort =res.data.sort;
-                       this.addForm.is_look =res.data.is_look;
-                       this.addForm.integral =res.data.integral;
-                       this.addForm.pay_method =res.data.pay_method;
-                       this.addForm.project_number =res.data.project_number;
+                       this.addForm = res.data;
                        this.image =imgUrlB+res.data.image;
+                       this.addForm.is_check = res.data.is_check.toString();
                        if(res.data.level_1!='0'){
                            this.getClass(res.data.level_1,2);
                            this.level_1 =  res.data.level_1;
                            this.level_2 = res.data.classify_id;
                        }
-                       if(tres.data.level_2!='0'){
-                           this.level_2 = tres.data.level_2;
+                       if(res.data.level_2!='0'){
+                           this.level_2 = res.data.level_2;
                        }
                        this.addForm.is_pay =  res.data.is_pay.toString();
-                       if(res.data.is_check=='0'){
+                       if(res.data.is_check==0){
                          this.delivery = true;
+                         this.switchValue = 0;
                        }else{
                          this.delivery = false;
+                         this.switchValue = 1;
                        } 
                        
                     } else {
@@ -238,14 +241,29 @@
                 });
             },
             Submit(){
-                if(this.level_1!=''&&this.level_2!=''){this.addForm.classify_id = this.level_2;}
-                if(this.level_1!=''&&this.level_2==''){this.addForm.classify_id = this.level_1;}
-                if(this.level_1==''&&this.level_2==''){this.addForm.classify_id = 0;}
-                if(this.delivery=true){this.addForm.is_check=0;}else{this.addForm.is_check=1;}
-                this.addForm.content = this.getUEContent();
-                console.log(this.addForm)
+              
                 if(this.$route.query.id){
-                    this.$ajax.postu(urlA+'/college/article/updateArticle',this.addForm).then((res) => {
+                    var params = {};
+                    if(this.level_1!=''&&this.level_2!=''){params.classify_id = this.level_2;}
+                    if(this.level_1!=''&&this.level_2==''){params.classify_id = this.level_1;}
+                    if(this.level_1==''&&this.level_2==''){params.classify_id = 0;}
+                    params.article_id = this.addForm.article_id;
+                    params.title = this.addForm.title;
+                    params.author = this.addForm.author;
+                    params.company = this.addForm.company;
+                    params.copyright = this.addForm.copyright;
+                    params.project_name = this.addForm.project_name;
+                    params.keywords = this.addForm.keywords;
+                    params.sort = this.addForm.sort;
+                    params.is_look = this.addForm.is_look;
+                    params.integral = this.addForm.integral;
+                    params.pay_method = this.addForm.pay_method;
+                    params.project_number = this.addForm.project_number;
+                    params.image = this.addForm.image;
+                    params.is_check = this.addForm.is_check;
+                    params.is_pay = this.addForm.is_pay;
+                    params.content = this.getUEContent();
+                    this.$ajax.postu(urlA+'/college/article/updateArticle',params).then((res) => {
                         if (res.msg == "success") {
                         this.$message.success('更新成功');
                         this.$router.push({ path: '/article'});
@@ -257,7 +275,11 @@
                         }
                     });
                 }else{
-                   this.$ajax.postu(urlA+'/college/article/saveArticle',this.addForm).then((res) => {
+                    if(this.level_1!=''&&this.level_2!=''){this.addForm.classify_id = this.level_2;}
+                    if(this.level_1!=''&&this.level_2==''){this.addForm.classify_id = this.level_1;}
+                    if(this.level_1==''&&this.level_2==''){this.addForm.classify_id = 0;}
+                    this.addForm.content = this.getUEContent();
+                    this.$ajax.postu(urlA+'/college/article/saveArticle',this.addForm).then((res) => {
                         if (res.msg == "success") {
                         this.$message.success('添加成功');
                         this.$router.push({ path: '/article'});
@@ -271,10 +293,12 @@
                 }
             
             },
-         
+           handleSwitch(row){
+             console.log(row)
+             this.switchValue = row;
+           },
             cancel(){
-               this.editVisible = false;
-               this.pwVisible = false;
+               this.$router.go(-1);
             },
             
             handleAvatarSuccess(res, file) {

@@ -8,14 +8,16 @@
         <div class="container">
             <div class="handle-box">
               <el-input v-model="id" placeholder="输入活动编号" class="handle-input mr10" @keyup.enter.native="getData"></el-input>
-               <!--<el-date-picker type="date" placeholder="请选择日期" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>
-              <el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">
-                    <el-option key="1" label="广东省" value="广东省"></el-option>
-                    <el-option key="2" label="湖南省" value="湖南省"></el-option>
-                </el-select>
-                <el-button type="primary" icon="search" @click="reload">刷新</el-button>
-                -->
-              <el-button type="primary" icon="search" @click="getData">搜索</el-button>
+              <el-input v-model="name" placeholder="输入活动名称" class="handle-input mr10" @keyup.enter.native="getData"></el-input>
+              <el-date-picker type="datetime" placeholder="活动开始时间" v-model="startTime" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+              <el-date-picker type="datetime" placeholder="活动截止时间" v-model="endTime" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+              <el-select v-model="activeState" placeholder="活动状态" class="handle-select mr10">
+                <el-option key="" label="全部" value=""></el-option>
+                <el-option key="0" label="开启" value="0"></el-option>
+                <el-option key="1" label="关闭" value="1"></el-option>
+              </el-select>
+                
+              <el-button type="primary" icon="search" @click="getData(1)">搜索</el-button>
             </div>
            <div class="handle-box add">
                <!--<el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>-->
@@ -26,7 +28,15 @@
                 <!-- <el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="id" label="活动编号" align="center"></el-table-column>
                 <el-table-column prop="name" label="活动名称" align="center"></el-table-column>
-                <el-table-column prop="lableName" label="活动类型" align="center"> </el-table-column>
+                <el-table-column label="活动类型" align="center"> 
+                  <template slot-scope="scope">
+                        <span v-if="scope.row.lableName == '1'">满减</span>  
+                        <span v-else-if="scope.row.lableName == '2'">打折</span>
+                        <span v-else-if="scope.row.lableName == '3'">满赠</span>
+                        <span v-else-if="scope.row.lableName == '4'">半价</span>
+                        <span v-else>{{scope.row.lableName}}</span>
+                   </template>
+                </el-table-column>
                 <el-table-column label="终端" align="center">
                    <template slot-scope="scope">
                         <span v-if="scope.row.releaseTo == '0'">商城</span>  
@@ -61,7 +71,7 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <!--  <div class="pagination">
+             <div class="pagination">
                 <el-pagination
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
@@ -69,7 +79,7 @@
                 layout="total,prev, pager, next, jumper"
                 :total="total">
                 </el-pagination>
-            </div>-->
+            </div>
         </div>
 
         <!-- 编辑弹出框 -->
@@ -262,11 +272,15 @@
                         <!--<div style="float:left;height:30px;line-height:30px;width:120px;margin-left:15px;"><a target="_blank" href="http://47.99.133.23:8000/images/desc.docx" class="down">点我下载H5上传说明</a></div>-->
                       
                     </el-form-item>
-
-
-
-
-                     <el-form-item label="活动规则描述">
+                    <el-form-item label="模板背景色">
+                        <el-color-picker
+                           style="width:100px;"
+                            v-model="form.colour"
+                            show-alpha
+                            :predefine="predefineColors">
+                        </el-color-picker>
+                    </el-form-item>
+                    <el-form-item label="活动规则描述">
                         <el-input type="textarea" :rows="4" placeholder="请输入活动规则" v-model="form.activityRulesName"></el-input>
                     </el-form-item>
                     <el-form-item label="规则展示">
@@ -320,7 +334,12 @@
                 is_search: false,
                 editVisible: false,
                 delVisible: false,
+                // 搜索条件
                 id:'',//活动id
+                activeState:'',
+                name:'',
+                startTime:'',
+                endTime:'',
                 delivery:false,//定时控制
                 moveImage:'',//移动端图片
                 webImage:'', //web端图片
@@ -337,10 +356,27 @@
                 restaurants1: [],
                 restaurants2: [],
                 loadImg:imgUrl+"distributor/uploadimg/fileUpload",
+                // 默认背景颜色
+                predefineColors:[
+                    '#2ea4be',
+                    '#ff8c00',
+                    '#ffd700',
+                    '#90ee90',
+                    '#00ced1',
+                    '#1e90ff',
+                    '#c71585',
+                    'rgba(255, 69, 0, 0.68)',
+                    'rgb(255, 120, 0)',
+                    'hsv(51, 100, 98)',
+                    'hsva(120, 40, 94, 0.5)',
+                    'hsl(181, 100%, 37%)',
+                    'hsla(209, 100%, 56%, 0.73)',
+                    '#c7158577'
+                    ]
             }
         },
         created() {
-            this.getData();
+            this.getData(1);
             this.getType(); 
 
         },
@@ -356,10 +392,10 @@
             // 分页导航
             handleCurrentChange(val) {
                 this.cur_page = val;
-                this.getData();
+                this.getData(this.cur_page );
             },
             reload(){
-                this.getData();
+                this.getData(1);
             },
             //去查看产品
             goExport(arr){
@@ -390,12 +426,16 @@
                 });
             },
             // 获取列表数据
-            getData() {
+            getData(arr) {
                 var filter = {};
-                // filter.pageNum  = this.cur_page;
-                // filter.pageSize =10;
+                filter.page = arr;
+                filter.limit =10;
                 filter.id = this.id;
-                this.$ajax.postu(url+'/distributor/tstdistributoraddactivity.api?select', filter).then((res) => {
+                filter.name = this.name;
+                filter.startTime = this.startTime;
+                filter.end_time = this.endTime;
+                filter.activeState = this.activeState;
+                this.$ajax.postu(url+'distributor/tstdistributoraddactivity.api?selectListPaging', filter).then((res) => {
                     if (res.description == "success") {
                        this.tableData = res.data;
                     //    this.total = res.data.total;
@@ -438,7 +478,7 @@
                     webUrlType:item.webUrlType,
                     moveUrlType:item.moveUrlType,
                     smallUrlType:item.smallUrlType,
-
+                    colour:item.colour,
                     activityRulesType:item.activityRulesType.toString(),
                     activityRulesName:item.activityRulesName,
                     sort:item.sort
@@ -547,9 +587,9 @@
              
             loadAll1() {
                 return [
-                { "value": url+"html/h5/activitys.html","name":"(双十二模板)"},
-                { "value": url+"activity.html#/doing","name":"(解决方案模板)"},
-                { "value": url+"activity.html#/discount","name":"(折扣活动模板)"},
+                { "value": imgUrlB+"html/h5/activitys.html","name":"(双十二模板)"},
+                { "value": imgUrlB+"activity.html#/doing","name":"(解决方案模板)"},
+                { "value": imgUrlB+"activity.html#/discount","name":"(折扣活动模板)"},
                 ];
             },
             loadAll2() {
@@ -627,7 +667,7 @@
 
 </script>
 
-<style scoped>
+<style>
     .handle-box {
         margin-bottom: 20px;
     }
@@ -683,6 +723,10 @@
 }
 .down:hover{
     background:#fff;
+}
+.el-color-picker--small .el-color-picker__trigger{
+    height:50px !important;
+    width:150px !important;
 }
    
 </style>
