@@ -74,12 +74,21 @@
                         subs: [
                             {
                                 index: 'article',
-                                title: '文章发布'
+                                title: '栏目发布'
+                            },
+                            {
+                                index: 'fund',
+                                title: '基金发布'
+                            },
+                             {
+                                index: 'column_class',
+                                title: '栏目分类'
                             },
                             {
                                 index: 'article_class',
-                                title: '文章分类'
+                                title: '基金分类'
                             },
+                             
                             {
                                 index: 'video',
                                 title: '视频发布'
@@ -103,6 +112,39 @@
                                 index: 'groups',
                                 title: '拼团管理'
                             },
+                        ]
+                    },
+                    {
+                      icon: 'el-icon-view',
+                        index: '6',
+                        title: '统计管理',
+                        subs: [
+                            {
+                                index: 'register_reward',
+                                title: '用户领奖统计'
+                            },
+                            {
+                                index: 'brand_statistic',
+                                title: '活动统计'
+                            },
+                             {
+                                index: 'activity_statistic',
+                                title: '促销统计'
+                            },
+                            
+                        ]
+                    },
+                     {
+                      icon: 'el-icon-edit',
+                        index: '7',
+                        title: '改版管理',
+                        subs: [
+                            {
+                                index: 'labelOne',
+                                title: '首页分类'
+                            },
+                          
+                            
                         ]
                     },
                     //  {

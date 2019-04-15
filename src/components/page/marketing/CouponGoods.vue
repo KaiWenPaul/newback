@@ -52,7 +52,7 @@
             </div>
              -->
         </div>
-        <el-dialog title="上传产品" :visible.sync="dialogVisible" width="30%">
+        <el-dialog title="上传产品" :visible="dialogVisible" width="30%" @close="cancel">
            <div style="width:100%;height:100px;">
               <form  id="form" enctype="multipart/form-data">
                 <!--<input type="text" value="1" v-model="id">-->
@@ -62,7 +62,7 @@
               </div>
         </el-dialog>
           <!-- 新增弹出框-->
-        <el-dialog title="新增" :visible.sync="addVisible" width="30%">
+        <el-dialog title="新增" :visible="addVisible" width="30%" @close="cancel">
             <el-form ref="form" :model="addForm" label-width="100px">
                 <el-form-item label="商品ID">
                     <el-input v-model="addForm.goodsId"></el-input>
@@ -75,7 +75,7 @@
             </span>
         </el-dialog>
         <!-- 编辑弹出框-->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+        <el-dialog title="编辑" :visible="editVisible" width="30%" @close="cancel">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="商品ID">
                     <el-input v-model="form.goodsId"></el-input>
@@ -101,7 +101,7 @@
         </el-dialog>
 
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center @close="cancel">
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -176,6 +176,11 @@
 			},
             open(){
                 this.dialogVisible=true; 
+            },
+            cancel(){
+                this.addVisible =false;
+                this.editVisible =false;
+                this.delVisible = false;
             },
             //下载模板
             download(){

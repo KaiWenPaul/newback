@@ -36,12 +36,12 @@
                 <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
                 <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button type="text"  v-if="scope.row.completeType == '100'" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </div>
-        <el-dialog title="附件" :visible.sync="loadVisible">
+        <el-dialog title="附件" :visible="loadVisible" :before-close="handleClose" @close="cancel">
             <el-upload
                 :action="loadAction"
                 :on-success="upload_success"
@@ -55,12 +55,12 @@
                 <div slot="tip" class="el-upload__tip">上传成功后，请点击保存,可连续上传多个文件</div>
             </el-upload>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="loadVisible = false">关闭</el-button>
+                <el-button @click="cancel">关闭</el-button>
                 <el-button type="primary" @click.native="save" :loading="saveLoading">保存</el-button>
             </span>
         </el-dialog>
        <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -100,7 +100,9 @@
                 timer:null,
                 saveLoading:false,
                 fileIds:'',
-                uploadId:''
+                uploadId:'',
+                windowName:'',
+                fileName:'',
             }
         },
         created() {
@@ -132,11 +134,20 @@
              handleExceed(files, fileList) {
                 this.$message.warning(`暂只支持上传一个文件`);
             },
+            cancel(){
+                this.loadVisible=false;
+                this.fileList=[];
+            },
+            handleClose(){
+                this.loadVisible = true;
+            },
              // 上传成功回调
             upload_success:function(response, file, fileList){
                 console.log(fileList)
-                var windowName = "/mnt/disha"+response.data;
-                this.upLoad(windowName,file.name,0)
+                // var windowName = "/mnt/disha"+response.data;
+                // this.upLoad(windowName,file.name,0)
+                this.windowName = "/mnt/disha"+response.data;
+                this.fileName = file.name;
             },
 
             openLoad(){
@@ -156,15 +167,17 @@
                     }
                 });
             },
-            upLoad(arr,brr,crr) {
+         save() {
                 var filter = {};
                 filter.memberId = localStorage.getItem('account_id');
-                filter.excelName = arr;
-                filter.primaryExcelName =brr;
-                filter.source = crr;
+                filter.excelName = this.windowName;
+                filter.primaryExcelName =this.fileName;
+                filter.source = 0;
                 this.$ajax.postu(url+'/goodsController.api?excelloginsert',filter).then((res) => {
                     if (res.status == "ok") {
-                       this.fileIds = res.data;
+                    //    this.fileIds = res.data;
+                    this.upLoad(res.data);
+                    console.log(123)
                     } else {
                         this.$message({
                         message: res.error,
@@ -173,25 +186,43 @@
                     }
                 });
             },
-           save(){
+           upLoad(arr){
+                var _this= this;
                 this.saveLoading = true;
                 var filter = {};
-                filter.id = this.fileIds;
-                console.log(this.fileIds)
+                // filter.id = this.fileIds;
+                filter.id = arr;
                 filter.merchants_account_id1 = localStorage.getItem('account_id');
-                this.$ajax.postu(url+"/goodsController.api?loadGoodsDetailExcelNew",filter).then((res) => {
-                    this.loadVisible = false;
-                    this.saveLoading = false;
-                    this.fileList = [];
-                    // if (res.status == "ok") {
-                    // this.timer =window.setInterval(this.getData, 1000);
-                    // } else {
-                    //     this.$message({
-                    //     message: res.error,
-                    //     type: 'error'
-                    //     });
-                    // }
-                }); 
+                this.$ajax.postAjax(url+"/goodsController.api?loadGoodsDetailExcelNew",filter,function(res){
+                        if (res.status == "ok") {
+                        _this.$message.success('上传成功');
+                        _this.loadVisible = false;
+                        _this.fileList = [];
+                         _this.saveLoading = false;
+                        } else {
+                            _this.$message({
+                            message: res.error,
+                            type: 'error',
+                            duration:10000
+                            });
+                           _this.loadVisible = false;
+                           _this.fileList = [];
+                           _this.saveLoading = false;
+                        }
+                   })
+                // this.$ajax.postu(url+"/goodsController.api?loadGoodsDetailExcelNew",filter).then((res) => {
+                //     this.loadVisible = false;
+                //     this.saveLoading = false;
+                //     this.fileList = [];
+                //     // if (res.status == "ok") {
+                //     // this.timer =window.setInterval(this.getData, 1000);
+                //     // } else {
+                //     //     this.$message({
+                //     //     message: res.error,
+                //     //     type: 'error'
+                //     //     });
+                //     // }
+                // }); 
            },
              handleDelete(index, row) {
                 this.idx = row.id;
@@ -272,5 +303,8 @@
     }
    .el-upload-list__item-name:hover{
       background:#fff !important;
+   }
+   .el-dialog__headerbtn .el-dialog__close{
+       display:none !important;
    }
 </style>

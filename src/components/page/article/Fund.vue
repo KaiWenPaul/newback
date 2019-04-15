@@ -19,9 +19,9 @@
               <el-button type="primary" icon="search" @click="getData">搜索</el-button>
             </div>
            <div class="handle-box add">
-             <el-button type="primary" icon="el-icon-edit" class="handle-del mr10" @click="releaseGo">发布文章</el-button>
-             <el-button type="primary" icon="delete" class="handle-del mr10" @click="opendelAll">批量删除文章</el-button>
-             <el-button type="primary" icon="delete" class="handle-del mr10" @click="exportAll">批量导入文章</el-button>
+             <el-button type="primary" icon="el-icon-edit" class="handle-del mr10" @click="releaseGo">发布基金文章</el-button>
+             <el-button type="primary" icon="delete" class="handle-del mr10" @click="opendelAll">批量删除基金文章</el-button>
+             <el-button type="primary" icon="delete" class="handle-del mr10" @click="exportAll">批量导入基金文章</el-button>
              <el-button type="primary" icon="delete" class="handle-del mr10" @click="download">下载模板</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
@@ -177,7 +177,7 @@ import UE from '../../common/Idtor.vue';
                 filter.pageSize =10;
                 filter.article_id = this.articleId;
                 filter.title = this.name;
-                filter.column_id =2 ;
+                filter.column_id =1 ;
                 this.$ajax.postu(urlA+'/college/article/getArticleList', filter).then((res) => {
                     if (res.msg == "success") {
                        this.tableData = res.data.list;
@@ -194,13 +194,13 @@ import UE from '../../common/Idtor.vue';
             // 编辑
             handleEdit(row) {
             console.log(row)
-             this.$router.push({ path: '/editor_article',query: {id:row.article_id}})
+             this.$router.push({ path: '/editor_fund',query: {id:row.article_id}})
             //   this.$router.push({ name: '文章编辑',query: {id:row.article_id,str:'<p>123456789</p>'}})
             
             },
             // 去添加和编辑文章
             releaseGo(){
-               this.$router.push({ path: '/editor_article'})
+               this.$router.push({ path: '/editor_fund'})
             },
             // 下载文章模板
             download(){

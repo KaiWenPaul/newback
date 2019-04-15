@@ -55,7 +55,7 @@
             </div>
         </div>
        <!-- 查看弹出框 -->
-        <el-dialog title="查看详情" :visible.sync="listVisible" width="50%">
+        <el-dialog title="查看详情" :visible="listVisible" width="50%">
              <el-form ref="form" :model="form" label-width="100px" style="width:600px;">
                     <el-form-item label="店铺id"><el-input v-model="form.shopId" :disabled="true"></el-input></el-form-item>
                     <el-form-item label="用户id"><el-input v-model="form.userId" :disabled="true"></el-input></el-form-item>
@@ -69,7 +69,7 @@
         </el-dialog>
       
         <!-- 编辑弹出框 -->
-        <el-dialog title="活动编辑" :visible.sync="editVisible" width="50%">
+        <el-dialog title="活动编辑" :visible="editVisible" width="50%">
              <el-form ref="form" :model="form" label-width="100px" style="width:600px;">
                     <el-form-item label="店铺id" v-if="isAdd===false"><el-input v-model="form1.shopId" :disabled="true"></el-input></el-form-item>
                     <el-form-item label="用户id"><el-input :disabled="true" v-model="form1.userId"></el-input></el-form-item>
@@ -105,7 +105,7 @@
         </el-dialog>
 
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>

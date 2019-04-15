@@ -43,6 +43,7 @@
         methods: {
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
+                    console.log(valid)
                     if (valid) {
                         // localStorage.setItem('ms_username',this.ruleForm.username);
                         // this.$router.push('/');

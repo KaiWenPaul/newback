@@ -59,7 +59,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog :title="title" :visible.sync="editVisible" width="50%">
+        <el-dialog :title="title" :visible="editVisible" width="50%" @close="cancel">
              <el-form ref="form" :model="form" label-width="100px" style="width:600px;">
                     <el-form-item label="优惠券编号" v-if="isAdd===false">
                         <el-input v-model="form.couponNo" disabled></el-input>
@@ -104,7 +104,7 @@
         </el-dialog>
 
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center @close="cancel">
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -228,7 +228,9 @@
                  });
                 }else{
                     this.isAdd = true;
-                    this.form.id = this.id;
+                    // this.form.id = this.id;
+                    this.form.couponStarttime= moment(this.form.couponStarttime).format('YYYY/MM/DD HH:mm:ss'),
+                    this.form.couponEndtime= moment(this.form.couponEndtime).format('YYYY/MM/DD HH:mm:ss'),
                     this.$ajax.postu(url+'havecoupon.api?insert',this.form).then((res) => {
                     if (res.status == "ok") {
                        this.$message.success('添加成功');
@@ -248,6 +250,7 @@
             },
             cancel(){
                this.editVisible = false;
+               this.delVisible =false;
             },
             handleDelete(index, row) {
                 this.idx = row.id;

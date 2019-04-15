@@ -1,24 +1,51 @@
 import axios from 'axios'
 import qs from 'qs'
 
-axios.interceptors.request.use(config => {
-  // loading
-  // config.headers.Authorization = localStorage.getItem('token');
-  // let token = localStorage.getItem('token');
-  //   if (token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
-  //       config.headers.Authorization = token;
-  //       // console.log('interceptors config=',config)
-  //   }
-  return config
-}, error => {
-  return Promise.resolve(error.response)
-})
-
-axios.interceptors.response.use(response => {
-  return response
-}, error => {
-  return Promise.resolve(error.response)
-})
+// axios.interceptors.request.use(config => {
+//   return config
+// }, error => {
+//   return Promise.resolve(error.response)
+// })
+// axios.defaults.timeout =  1000;
+// axios.interceptors.response.use(response => {
+//   return response
+// }, error => {
+//   return Promise.resolve(error.response)
+// })
+// 超时设置，一般后台处理慢，前台超时报错
+// axios.defaults.retry = 50;
+// axios.defaults.retryDelay = 1000;
+ 
+// //在API文件中
+// axios.interceptors.response.use(undefined, function axiosRetryInterceptor(err) {
+//     var config = err.config;
+//     // If config does not exist or the retry option is not set, reject
+//     if(!config || !config.retry) return Promise.reject(err);
+    
+//     // Set the variable for keeping track of the retry count
+//     config.__retryCount = config.__retryCount || 0;
+    
+//     // Check if we've maxed out the total number of retries
+//     if(config.__retryCount >= config.retry) {
+//         // Reject with the error
+//         return Promise.reject(err);
+//     }
+    
+//     // Increase the retry count
+//     config.__retryCount += 1;
+    
+//     // Create new promise to handle exponential backoff
+//     var backoff = new Promise(function(resolve) {
+//         setTimeout(function() {
+//             resolve();
+//         }, config.retryDelay || 1);
+//     });
+    
+//     // Return the promise in which recalls axios to retry the request
+//     return backoff.then(function() {
+//         return axios(config);
+//     });
+// });
 
 function checkStatus (response) {
   // loading
@@ -126,6 +153,21 @@ export default {
         return checkCode(res)
       }
     )
+  },
+  postAjax(url, data, suc) {
+    return  $.ajax({
+      url: url,
+      type: 'POST',
+      data: data,
+      async:false, //或false,是否异步
+      dataType: 'json',
+      success: function (res) {   
+              suc(res);
+      },
+      error: function () {
+          alert('网络异常,请稍后再试');
+      }
+  });
   },
  
   // hy add

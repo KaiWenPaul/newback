@@ -213,8 +213,7 @@
             },
          
             cancel(){
-               this.editVisible = false;
-               this.pwVisible = false;
+              this.$router.go(-1);
             },
             
         },

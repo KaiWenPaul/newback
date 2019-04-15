@@ -5,6 +5,7 @@
 // window.urlA ="http://47.99.133.23:18080/";
 // window.imgUrlB = "http://www.valubio.com/";
 // window.downUrl = "http://106.14.17.171/";
+// window.imgUrlA = "http://47.99.133.23:18080/";
 
 window.url = "http://47.99.133.23:8080/sw/";
 window.imgUrl = "http://47.99.133.23:8080/sw/";

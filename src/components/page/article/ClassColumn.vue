@@ -8,16 +8,16 @@
         <div class="container">
                <div class="handle-box">
               <el-input v-model="classify_name" placeholder="输入分类名" class="handle-input mr10"></el-input>
-              <el-input v-model="classify_id" placeholder="输入分类id" class="handle-input mr10"></el-input>
-            <el-input v-model="parent_id" placeholder="输入父类id" class="handle-input mr10"></el-input>
+              <el-input v-model="classify_id" placeholder="输入分类编号" class="handle-input mr10"></el-input>
              <!-- <el-input v-model="corporateName" placeholder="输入公司名称" class="handle-input mr10"></el-input>
               <el-date-picker type="date" placeholder="请选择日期" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>-->
-              <el-select v-model="level" placeholder="级别" class="handle-select mr10">
-                    <el-option key="1" label="一级分类" value="1"></el-option>
-                    <el-option key="2" label="二级分类" value="2"></el-option>
-                    <el-option key="3" label="三级分类" value="3"></el-option>
+              <label>状态:</label>
+              <el-select v-model="check_state" placeholder="状态" class="handle-select mr10">
+                    <el-option key="" label="全部" value=""></el-option>
+                    <el-option key="0" label="开启" value="0"></el-option>
+                    <el-option key="1" label="关闭" value="1"></el-option>
                 </el-select>
-              <el-button type="primary" icon="search" @click="getData()">搜索</el-button>
+              <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
             <div class="handle-box add">
              <el-button type="primary" icon="el-icon-edit" class="handle-del mr10" @click="showAddDialog">新增</el-button>
@@ -27,7 +27,7 @@
                <!--<el-table-column type="selection" width="55" align="center"></el-table-column>-->
                 <el-table-column prop="classify_id" label="分类编号"  align="center" ></el-table-column>
                 <el-table-column prop="classify_name" label="分类名称"  align="center"></el-table-column>
-                <el-table-column prop="video_num" label="视频数量"  align="center"></el-table-column>
+                <el-table-column prop="article_num" label="文章数量"  align="center"></el-table-column>
                 <el-table-column label="可见范围" align="center">
                   <template slot-scope="scope">
                    <span v-if="scope.row.is_look=='1'">全平台</span>
@@ -122,7 +122,7 @@
         <!--新增界面-->
         <el-dialog title="新增分类" :visible="addFormVisible" :close-on-click-modal="false" @close="cancel">
             <el-form :model="addForm" label-width="100px" ref="addForm">
-            <el-form-item label="视频分类名称">
+            <el-form-item label="栏目分类名称">
                 <el-input v-model="addForm.classify_name" auto-complete="off" placeholder="1-10个字"></el-input>
             </el-form-item>
             <el-form-item label="一级分类">
@@ -193,6 +193,7 @@
                 total:0,
                 multipleSelection: [],
                 check_state: '',
+                column_id:'',
                 del_list: [],
                 is_search: false,
                 editVisible: false,
@@ -213,8 +214,6 @@
                 state:'',
                 classify_name:'',
                 classify_id:'',
-                parent_id:'',
-                level:'',
                 editForm: {
                 },
                 idx: -1,
@@ -222,13 +221,13 @@
                 articleId:'',
                 isUp:false,
                 delId:'',
-                testData:{}
+                testData:{},
+                parentId:false,
             }
         },
         created() {
-            this.getData(0);
+            this.getData(0,1);
             this.getClass(0,1,0);
-            console.log(123)
         },
         methods: {
             handleSizeChange(val) {
@@ -237,39 +236,47 @@
             // 分页导航
             handleCurrentChange(val) {
                 this.cur_page = val;
-                this.getData();
+                this.getData(0,this.cur_page);
+            },
+            search(){
+                if(this.classify_id!=''){
+                  this.getData(this.classify_id,1)
+                }else{
+                     this.getData(0,1)
+                }
             },
             // 获取列表数据
-           getData(arr,crr) {
+           getData(arr,brr) {
+               var self=this;
                 var filter = {};
-                filter.pageNum   = this.cur_page;
+                filter.pageNum   = brr;
                 filter.pageSize =10;
-                filter.parent_id = arr;
+                filter.column_id =2 ;
                 if(this.classify_name!=''){filter.classify_name=this.classify_name}
-                if(this.level!=''){filter.level=this.level}
-                if(this.check_state!=''){
-                    if(this.check_state==3){
-                       filter.is_check='' 
-                    }else{
-                       filter.is_check=this.check_state
-                    }
-                    }
-                if(this.classify_id!=''){filter.classify_id=this.classify_id}
-                   this.$ajax.postu(urlA+'/video/videoClassify/getVideoClassifyList', filter).then((res) => {
+              
+                if(this.check_state==3){
+                    filter.is_check='' 
+                }else{
+                    filter.is_check=this.check_state
+                }
+                if(this.classify_id!=''){ filter.classify_id=this.classify_id }else{  filter.parent_id = arr;}
+                   this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassifyList', filter).then((res) => {
                     if (res.msg == "success") {
                         if(res.data.list!=''){
-                           this.tableData = res.data.list;
-                           this.total = res.data.total;
-                           if(res.data.list[0].level=='2'||res.data.list[0].level=='3'){this.isUp=true}else{this.isUp=false}
+                            console.log(this.tableData)
+                           self.tableData = res.data.list;
+                           self.total = res.data.total;
+                             if(res.data.list.length==1){
+                               if(res.data.list[0].level=='1'){localStorage.setItem('parentId',0)}
+                               else if(res.data.list[0].level=='2'){localStorage.setItem('parentId',0)}
+                               else if(res.data.list[0].level=='3'){localStorage.setItem('parentId',res.data.list[0].level_1)}
+                               else if(res.data.list[0].level=='4'){localStorage.setItem('parentId',res.data.list[0].level_2)}
+                               this.parentId = true;
+                           }
+                           if(res.data.list[0].level=='2'||res.data.list[0].level=='3'){self.isUp=true}else{self.isUp=false}
                         }else{
-                            if(crr){
-                               if(crr.level=='3'){this.getData(crr.level_1)}else {this.getData(0)}
-                            }else{
-                               this.$message({
-                                message:'没有东西了哟',
-                                type: 'warning'
-                                });
-                            }   
+                        
+                              
                         }
                     } else {
                         this.$message({
@@ -283,13 +290,14 @@
             getClass(arr,brr,crr) {
                 var filter = {};
                 filter.parent_id =arr;
-                this.$ajax.postu(urlA+'/video/videoClassify/getVideoClassifyList', filter).then((res) => {
+                filter.columnId =2 ;
+                this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassify', filter).then((res) => {
                     if (res.msg == "success") {
                         if(brr=='1'){
-                          this.optionsA = res.data.list;
+                          this.optionsA = res.data;
                           this.optionsB = [];
                         }else if(brr=='2'){
-                          this.optionsB = res.data.list;
+                          this.optionsB = res.data;
                           if(crr=='1'){
                             this.level_2='';
                           }
@@ -302,23 +310,24 @@
                     }
                 });
             },
-            // 查看下一级
+            // 下一级
             getDown(arr){
                 var filter = {};
                 filter.pageNum   = 1;
                 filter.pageSize =10;
                 filter.parent_id = arr;
-                this.$ajax.postu(urlA+'/video/videoClassify/getVideoClassifyList', filter).then((res) => {
+                filter.column_id =2 ;
+                this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassifyList', filter).then((res) => {
                     if (res.msg == "success") {
                         if(res.data.list!=''){
                            this.tableData = res.data.list;
                            this.total = res.data.total;
                            if(res.data.list[0].level=='2'||res.data.list[0].level=='3'){this.isUp=true}else{this.isUp=false}
-                        }else{
+                        }else{      
                                this.$message({
                                 message:'没有东西了哟',
                                 type: 'warning'
-                                });      
+                                });                          
                         }
                     } else {
                         this.$message({
@@ -333,12 +342,13 @@
                 var filter = {};
                 filter.pageNum   = 1;
                 filter.pageSize =10;
+                filter.column_id =2 ;
                 if(row.level=='2'){
                    filter.parent_id = 0;
                 }else if(row.level=='3'){
                    filter.parent_id = row.level_1;
                 }
-                this.$ajax.postu(urlA+'/video/videoClassify/getVideoClassifyList', filter).then((res) => {
+                this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassifyList', filter).then((res) => {
                     if (res.msg == "success") {
                        this.tableData = res.data.list;
                        this.total = res.data.total;
@@ -370,15 +380,17 @@
                 if(this.level_1==''&&this.level_2==''){
                     this.addForm.parent_id = 0;
                 }
+                this.addForm.column_id = 2;
                 if(this.delivery=true){this.addForm.is_check=0;}else{this.addForm.is_check=1;}
-                this.$ajax.postu(urlA+'/video/videoClassify/saveVideoClassify',this.addForm).then((res) => {
+                this.$ajax.postu(urlA+'/college/articleClassify/saveArticleClassify',this.addForm).then((res) => {
                     if (res.msg == "success") {
                          this.$message({
                             message:'添加成功',
                             type: 'success'
                         });
                         this.addFormVisible = false;
-                        this.getData(0);
+                        this.getData(this.addForm.parent_id,1);
+                        this.getClass(0,1,0);
                     } else {
                         this.$message({
                         message: res.msg,
@@ -402,7 +414,7 @@
                   this.level_1=row.level_1;
                   this.level_2=row.level_2;
                   this.getClass(row.level_1,2,0);
-                  this.disabledA=false;
+                  this.disabledA=true;
                   this.disabledB=false;
               }
               if(row.is_check=='0'){
@@ -431,14 +443,15 @@
                 params.sort = this.editForm.sort;
                 params.remake = this.editForm.remake;
                 console.log(params)
-                this.$ajax.postu(urlA+'/video/videoClassify/updateVideoClassify',params).then((res) => {
+                this.$ajax.postu(urlA+'/college/articleClassify/updateArticleClassify',params).then((res) => {
                     if (res.msg == "success") {
                          this.$message({
                             message:'修改成功',
                             type: 'success'
                         });
                         this.editFormVisible = false;
-                        this.getData(params.parent_id);
+                        this.getData(params.parent_id,1);
+                        this.getClass(0,1,0);
                     } else {
                         this.$message({
                         message: res.msg,
@@ -457,16 +470,21 @@
             handleDelete(index, row) {
                 this.idx = row.classify_id;
                 this.delVisible = true;  
-                if(row.level=='2'){this.delId=row.level_1}else if(row.level=='3'){this.delId=row.level_2};
+                if(row.level=='2'){this.delId=row.level_1}else if(row.level=='3'){this.delId=row.level_2}else if(row.level=='1'){this.delId=0};
                 this.testData = row;
             },
              // 确定删除
             deleteRow(){
-                 this.$ajax.postu(urlA+'//video/videoClassify/deleteVideoClassify',{classify_id:this.idx}).then((res) => {
+                 this.$ajax.postu(urlA+'/college/articleClassify/deleteArticleClassify',{classify_id:this.idx}).then((res) => {
                     if (res.msg == "success") {
                        this.$message.success('删除成功');
                        this.delVisible = false;
-                       this.getData(this.delId,this.testData);
+                        console.log(this.parentId==true)
+                       if(this.parentId==true){
+                         this.getData(localStorage.getItem('parentId'),1);   
+                       }else{
+                         this.getData(this.delId,1);
+                       }
                     } else {
                         this.$message({
                         message: res.msg,

@@ -57,7 +57,7 @@
                     </el-table-column>
                     <el-table-column label="操作" width="250" align="center">
                         <template slot-scope="scope">
-                            <el-button  v-if="scope.row.status" type="text" icon="el-icon-tickets" @click="openGet(scope.$index, scope.row)">生成信息</el-button>
+                            <el-button   v-if="scope.row.status" type="text" icon="el-icon-tickets" @click="openGet(scope.$index, scope.row)">生成信息</el-button>
                             <el-button  type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                         </template>
                     </el-table-column>
@@ -66,7 +66,7 @@
         </div>
 
         <!-- 商品二维码等信息 -->
-        <el-dialog title="产品信息" :visible.sync="goodsVisible" width="50%" @close="cancel">
+        <el-dialog title="产品信息" :visible="goodsVisible" width="50%" @close="cancel">
              <el-form ref="form"  label-width="100px">
                     <el-form-item label="web端链接:">
                     <!--<el-input style="width:500px;" v-model="webUrl"></el-input>-->
@@ -120,7 +120,7 @@
                 </el-table>
         </el-dialog>
 
-        <el-dialog title="上传" :visible="loadVisible" close='cancel' @close="cancel">
+        <el-dialog title="上传" :visible="loadVisible" close='cancel'>
             <el-upload
                 :action="loadAction"
                 :on-success="upload_success"
@@ -230,12 +230,12 @@
                 filter.groupBuyConfigId  = this.$route.query.id;
                 this.$ajax.postu(url+'groupBuyActivityBackendInterfaces.api?getGroupBuyActivityConfigDetail', filter).then((res) => {
                     if (res.status == "ok") {
-                        this.form = res.data.config;
+                        // this.form = res.data.config;
                         // this.tableData = res.data.goodsList;
-                        this.configStatus = res.data.config.status;
-                        for(var i=0;i<res.data.goodsList.length;i++){
-                            res.data.goodsList[i].status =res.data.config.status;
-                        }
+                        // this.configStatus = res.data.config.status;
+                        // for(var i=0;i<res.data.goodsList.length;i++){
+                        //     res.data.goodsList[i].status =res.data.config.status;
+                        // }
                          this.tableData = res.data.goodsList;
                     } else {
                         this.$message({
@@ -256,12 +256,7 @@
                 
             },
              handleExceed(files, fileList) {
-                // this.$message.warning(`暂只支持上传一个文件`);
-                this.$message({
-                                    message: '暂只支持上传一个文件',
-                                    type: 'warning',
-                                    duration:10000
-                                    });
+                this.$message.warning(`暂只支持上传一个文件`);
             },
              // 上传成功回调
             upload_success:function(response, file, fileList){
@@ -292,16 +287,14 @@
                                 }else{
                                     this.$message({
                                     message: res.data.message,
-                                    type: 'error',
-                                    duration:10000
+                                    type: 'error'
                                     });
                                     }
                             this.loadVisible = false;
                             } else {
                                 this.$message({
                                 message: res.error,
-                                type: 'error',
-                                duration:10000
+                                type: 'error'
                                 });
                             }
                         });
@@ -342,7 +335,6 @@
            },
            closeDialog(){
                this.sku = "";
-               this.FormVisible = false;
            },
            getChoose(){
               this.$ajax.postu(url+'groupBuyActivityBackendInterfaces.api?getGoodsInfoBySku', {sku:this.sku}).then((res) => {
@@ -387,7 +379,6 @@
             },
             //打开获取生成的商品信息二维码，链接等
             openGet(index,row){
-                
              this.goodsVisible = true;
              this.webUrl = imgUrlB+"/index.html#/shop?shopid="+row.goodsId;
              this.$ajax.postu(url+'/goodsController.api?getGoodsH5Url', {goods_id:row.goodsId}).then((res) => {
@@ -436,25 +427,7 @@
                console.log(row)
             },
             handleDelete(index, row) {
-               
-                if(row.status===this.configStatus){
-                    var params = {};
-                    params.goodsId = row.goodsId;
-                    params.groupBuyConfigId = this.$route.query.id;
-                    this.$ajax.postu(url+'/groupBuyActivityBackendInterfaces.api?deleteGroupBuyActivityGoods',params ).then((res) => {
-                        if (res.status == "ok") {
-                        this.$message.success('删除成功');
-                        this.getData();
-                        } else {
-                            this.$message({
-                            message: res.error,
-                            type: 'error'
-                            });
-                        }
-                    });  
-                }else{
-                    this.tableData.splice(index,1);
-                }
+                this.tableData.splice(index,1);
             },
             save(){
                 this.saveLoading = true;
@@ -464,45 +437,23 @@
                 this.groupBuyActivityQo.endTime = this.form.endTime;
                 this.groupBuyActivityQo.personNum = this.form.personNum;
                 this.groupBuyActivityQo.validHour = this.form.validHour;
-                if(this.$route.query.id){
-                   this.groupBuyActivityQo.activityConfigId =this.$route.query.id;
-                }
                 json.goodsList = this.tableData;
                 json.groupBuyActivityQo = this.groupBuyActivityQo;
 
-             
                 //同步处理
                  var _this = this;
-
-                if(this.$route.query.id){
-                    this.$ajax.postAjax(url+"/groupBuyActivityBackendInterfaces.api?updateGroupBuyActivity",{json:JSON.stringify(json)},function(res){
-                        if (res.status == "ok") {
-                        _this.$message.success('修改成功');
-                        _this.$router.push({ path: '/groups'})
-                        } else {
-                            _this.$message({
-                            message: res.error,
-                            type: 'error'
-                            });
-                        }
-                          _this.saveLoading = false;
+                this.$ajax.postAjax(url+"/groupBuyActivityBackendInterfaces.api?addGroupBuyActivity",{json:JSON.stringify(json)},function(res){
+                    if (res.status == "ok") {
+                    _this.$message.success('添加成功');
+                    _this.$router.push({ path: '/groups'})
+                    } else {
+                        _this.$message({
+                        message: res.error,
+                        type: 'error'
+                        });
+                    }
+                    _this.saveLoading = false;
                    })
-                  
-                }else{
-                      this.$ajax.postAjax(url+"/groupBuyActivityBackendInterfaces.api?addGroupBuyActivity",{json:JSON.stringify(json)},function(res){
-                         if (res.status == "ok") {
-                        _this.$message.success('添加成功');
-                        _this.$router.push({ path: '/groups'})
-                        } else {
-                            _this.$message({
-                            message: res.error,
-                            type: 'error'
-                            });
-                        }
-                          _this.saveLoading = false;
-                   })
-                  
-                }
                 
             },
            
@@ -511,8 +462,9 @@
                this.pwVisible = false;
                this.loadVisible = false;
                this.fileList=[];
-               this.delVisible=false;  
-               this.goodsVisible = false;          },
+                this.delVisible=false;  
+                this.goodsVisible = false;  
+            },
              // 确定删除
             deleteRow(){
                  this.$ajax.postu(url+'/groupBuyActivityBackendInterfaces.api?deleteGroupBuyActivity',{groupBuyConfigId:this.idx}).then((res) => {
@@ -581,7 +533,7 @@
        float:left;
        margin-right:5px;
    }
-   
+  
    .mr10{margin-bottom:10px;margin-right:10px;}
     .el-upload-list__item-name:hover{
       background:#fff !important;

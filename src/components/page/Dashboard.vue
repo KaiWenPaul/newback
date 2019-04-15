@@ -7,13 +7,13 @@
                         <img src="static/img/img.jpg" class="user-avator" alt="">
                         <div class="user-info-cont">
                             <div class="user-info-name">{{name}}</div>
-                            <div>{{role}}</div>
+                            <div style="margin-top:15px;">{{role}}</div>
                         </div>
                     </div>
-                    <div class="user-info-list">上次登录时间：<span>2018-01-01</span></div>
-                    <div class="user-info-list">上次登录地点：<span>东莞</span></div>
+                   <!-- <div class="user-info-list">上次登录时间：<span>2018-01-01</span></div>
+                    <div class="user-info-list">上次登录地点：<span>东莞</span></div>-->
                 </el-card>
-                <el-card shadow="hover" style="height:252px;">
+                <!--<el-card shadow="hover" style="height:252px;">
                     <div slot="header" class="clearfix">
                         <span>语言详情</span>
                     </div>
@@ -25,9 +25,9 @@
                     <el-progress :percentage="3.7"></el-progress>
                     HTML
                     <el-progress :percentage="0.9" color="#f56c6c"></el-progress>
-                </el-card>
+                </el-card>-->
             </el-col>
-            <el-col :span="16">
+           <!-- <el-col :span="16">
                 <el-row :gutter="20" class="mgb20">
                     <el-col :span="8">
                         <el-card shadow="hover" :body-style="{padding: '0px'}">
@@ -61,9 +61,9 @@
                                 </div>
                             </div>
                         </el-card>
-                    </el-col>
+                    </el-col>-->
                 </el-row>
-                <el-card shadow="hover" style="height:403px;">
+                <!--<el-card shadow="hover" style="height:403px;">
                     <div slot="header" class="clearfix">
                         <span>待办事项</span>
                         <el-button style="float: right; padding: 3px 0" type="text">添加</el-button>
@@ -100,7 +100,7 @@
                     <schart ref="line" class="schart" canvasId="line" :data="data" type="line" :options="options2"></schart>
                 </el-card>
             </el-col>
-        </el-row>
+        </el-row>-->
     </div>
 </template>
 
@@ -221,8 +221,8 @@
                 }, 300);
             },
             renderChart(){
-                this.$refs.bar.renderChart();
-                this.$refs.line.renderChart();
+                // this.$refs.bar.renderChart();
+                // this.$refs.line.renderChart();
             }
         }
     }

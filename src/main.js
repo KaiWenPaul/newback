@@ -21,6 +21,9 @@ import '../static/Ue/ueditor.all.min.js'
 import '../static/Ue/lang/zh-cn/zh-cn.js'
 import '../static/Ue/ueditor.parse.min.js'
 
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
+
 
 Vue.use(ElementUI, { size: 'small' });
 Vue.prototype.$axios = axios;

@@ -44,20 +44,72 @@
                 <span style="margin-left:42px;margin-right:5px;color:#606266">机构</span>
                 <el-input v-model="addForm.company" placeholder="" style="width:230px;"></el-input>
             </el-form-item>
+            <el-form-item label="职称">
+                <el-input v-model="addForm.job_title" placeholder="" style="width:230px;"></el-input>
+                <span style="margin-left:42px;margin-right:5px;color:#606266">研究性质</span>
+                <el-input v-model="addForm.research_nature" placeholder="" style="width:230px;"></el-input>
+                <span style="margin-left:42px;margin-right:5px;color:#606266">所属学部</span>
+                <el-input v-model="addForm.faculty" placeholder="" style="width:230px;"></el-input>
+            </el-form-item>
+              <el-form-item label="项目开始时间">
+                <el-date-picker type="date" placeholder="项目开始时间" v-model="addForm.start_time " value-format="yyyy-MM-dd"></el-date-picker>
+                <span style="margin-left:42px;margin-right:5px;color:#606266">项目结束时间</span>
+                 <el-date-picker type="date" placeholder="项目结束时间" v-model="addForm.end_time " value-format="yyyy-MM-dd"></el-date-picker>
+            </el-form-item>
             <el-form-item label="项目名称">
                 <el-input v-model="addForm.project_name" placeholder="" style="width:230px;"></el-input>
                 <span style="margin-left:15px;margin-right:5px;color:#606266">项目编号</span>
                 <el-input v-model="addForm.project_number" placeholder="" style="width:230px;"></el-input>
-                 <span style="margin-left:15px;margin-right:5px;color:#606266">所属学部</span>
-                 <el-input v-model="addForm.faculty" placeholder="" style="width:230px;"></el-input>
-                 <span style="margin-left:15px;margin-right:5px;color:#606266">金额</span>
+                <span style="margin-left:15px;margin-right:5px;color:#606266">金额</span>
                 <el-input v-model="addForm.project_funding" placeholder="" style="width:230px;"></el-input>
             </el-form-item>
             <el-form-item label="关键字">
                 <el-input v-model="addForm.keywords" auto-complete="off" style="width:545px;"></el-input>
             </el-form-item>
-           <el-form-item label="权重" prop="sort" :rules="[{type:'number',message:'权重值必须为数字'}]">
-                <el-input v-model.number="addForm.sort" placeholder="大于等于0的整数，不写默认排在最前面" style="width:260px;"></el-input>
+            <el-form-item label="附件">
+            <div class="upload">
+                <el-upload
+                    :action="loadAction"
+                    :on-success="upload_success"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :file-list="fileListA"
+                    :limit="1"
+                    :on-exceed="handleExceed"
+                    list-type="picture">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+                </div>
+            </el-form-item>
+            <el-form-item label="中文摘要">
+                <el-input type="textarea" :rows="4" style="width:500px;" placeholder="请输入中文摘要" v-model="addForm.chinese_abstract"></el-input>
+            </el-form-item>
+             <el-form-item label="英文摘要">
+                <el-input type="textarea" :rows="4" style="width:500px;" placeholder="请输入英文摘要" v-model="addForm.english_abstract"></el-input>
+            </el-form-item>
+            <el-form-item label="英文关键字">
+                <el-input v-model="addForm.english_keywords" auto-complete="off" style="width:545px;"></el-input>
+            </el-form-item>
+            <el-form-item label="结尾摘要">
+                <el-input type="textarea" :rows="4" style="width:500px;" placeholder="请输入结尾摘要" v-model="addForm.end_summary"></el-input>
+            </el-form-item>
+            <el-form-item label="权重">
+                <el-input v-model="addForm.sort" placeholder="大于等于0的整数，不写默认排在最前面" style="width:260px;"></el-input>
+            </el-form-item>
+            <el-form-item label="项目报告">
+            <div class="upload">
+                <el-upload
+                    :action="loadAction"
+                    :on-success="upload_success1"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :file-list="fileListB"
+                    :limit="1"
+                    :on-exceed="handleExceed"
+                    list-type="picture">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+                </div>
             </el-form-item>
             <el-form-item label="当前状态">
                 <el-col :span="5">
@@ -98,7 +150,7 @@
                 <el-radio v-model="addForm.is_pay" label="0">免费下载</el-radio>
             </el-form-item>
             <el-form-item label="封面图片">
-                        <el-upload
+                    <el-upload
                         class="avatar-uploader"
                         :action="loadImg"
                         :show-file-list="false"
@@ -106,7 +158,7 @@
                         :before-upload="beforeAvatarUpload">
                         <img v-if="image" :src="image" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                        </el-upload>
+                    </el-upload>
             </el-form-item>
             <el-form-item label="文章内容">
                 <!--<div class="editor-container">
@@ -117,7 +169,7 @@
                   </div>
             </el-form-item> 
             <el-form-item>
-                <el-button type="primary" @click="Submit('addForm')">提交</el-button>
+                <el-button type="primary" @click="Submit">提交</el-button>
                 <el-button @click="cancel">取消</el-button>
             </el-form-item>
             </el-form>
@@ -162,6 +214,9 @@
                 optionsC:[],
                 detailDatas:{},
                 msg:'',
+                fileListA:[],
+                fileListB:[],
+                loadAction:imgUrlA+"college/article/uploadFile",
 
             }
         },
@@ -208,6 +263,14 @@
                        this.detailDatas = res.data;
                        this.addForm = res.data;
                        this.image =imgUrlB+res.data.image;
+                       if(res.data.annex){
+                         this.fileListA.push({name:res.data.annex})
+                       }
+                      if(res.data.project_report){
+                         this.fileListB.push({name:res.data.project_report})
+                       }
+                      
+                    //    this.fileListB.push({name:res.data.project_report})
                        this.addForm.is_check = res.data.is_check.toString();
                        if(res.data.level_1!='0'&&res.data.level_2!='0'){
                            this.getClass1(res.data.level_1,2);
@@ -248,7 +311,7 @@
                 var filter = {};
                 console.log(arr)
                 filter.parent_id =arr;
-                filter.columnId =2 ;
+                filter.columnId =1 ;
                 this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassify', filter).then((res) => {
                     if (res.msg == "success") {
                         if(brr=='1'){
@@ -279,7 +342,7 @@
                 var filter = {};
                 console.log(arr)
                 filter.parent_id =arr;
-                filter.columnId =2 ;
+                filter.columnId =1 ;
                 this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassify', filter).then((res) => {
                     if (res.msg == "success") {
                         if(brr=='1'){
@@ -301,79 +364,114 @@
                 });
             },
 
-
-
-
-
-            Submit(formName){
-                this.$refs[formName].validate((valid) => {
-                    console.log(valid)
-                    if (valid) {
+            Submit(){
               
-                    if(this.$route.query.id){
-                        var params = {};
-                        if(this.level_1!=''&&this.level_2!=''&&this.level_3!=''){params.classify_id = this.level_3;}
-                        if(this.level_1!=''&&this.level_2!=''&&this.level_3==''){params.classify_id = this.level_2;}
-                        if(this.level_1!=''&&this.level_2==''&&this.level_3==''){params.classify_id = this.level_1;}
-                        if(this.level_1==''&&this.level_2==''&&this.level_3==''){params.classify_id = 0;}
-                        params.article_id = this.addForm.article_id;
-                        params.title = this.addForm.title;
-                        params.author = this.addForm.author;
-                        params.company = this.addForm.company;
-                        params.copyright = this.addForm.copyright;
-                        params.project_name = this.addForm.project_name;
-                        params.keywords = this.addForm.keywords;
-                        params.sort = this.addForm.sort;
-                        params.is_look = this.addForm.is_look;
-                        params.integral = this.addForm.integral;
-                        params.pay_method = this.addForm.pay_method;
-                        params.project_number = this.addForm.project_number;
-                        params.image = this.addForm.image;
-                        params.is_check = this.addForm.is_check;
-                        params.is_pay = this.addForm.is_pay;
-                        params.faculty = this.addForm.faculty;
-                        params.project_funding = this.addForm.project_funding;
-                        params.column_id =2 ;
-                        params.content = this.getUEContent();
-                        this.$ajax.postu(urlA+'/college/article/updateArticle',params).then((res) => {
-                            if (res.msg == "success") {
-                            this.$message.success('更新成功');
-                            this.$router.push({ path: '/article'});
-                            } else {
-                                this.$message({
-                                message: res.msg,
-                                type: 'error'
-                                });
-                            }
-                        });
-                    }else{
-                        if(this.level_1!=''&&this.level_2!=''&&this.level_3!=''){this.addForm.classify_id = this.level_3;}
-                        if(this.level_1!=''&&this.level_2!=''&&this.level_3==''){this.addForm.classify_id = this.level_2;}
-                        if(this.level_1!=''&&this.level_2==''&&this.level_3==''){this.addForm.classify_id = this.level_1;}
-                        if(this.level_1==''&&this.level_2==''&&this.level_3==''){this.addForm.classify_id = 0;}
-                        // if(this.level_1!=''&&this.level_2==''){this.addForm.classify_id = this.level_1;}
-                        // if(this.level_1==''&&this.level_2==''){this.addForm.classify_id = 0;}
-                        this.addForm.content = this.getUEContent();
-                        this.addForm.column_id =2;
-                        this.$ajax.postu(urlA+'/college/article/saveArticle',this.addForm).then((res) => {
-                            if (res.msg == "success") {
-                            this.$message.success('添加成功');
-                            this.$router.push({ path: '/article'});
-                            } else {
-                                this.$message({
-                                message: res.msg,
-                                type: 'error'
-                                });
-                            }
-                        });
-                    }
-                 } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
+                if(this.$route.query.id){
+                    var params = {};
+                    // if(this.level_1!=''&&this.level_2!=''){params.classify_id = this.level_2;}
+                    // if(this.level_1!=''&&this.level_2==''){params.classify_id = this.level_1;}
+                    // if(this.level_1==''&&this.level_2==''){params.classify_id = 0;}
+                    if(this.level_1!=''&&this.level_2!=''&&this.level_3!=''){params.classify_id = this.level_3;}
+                    if(this.level_1!=''&&this.level_2!=''&&this.level_3==''){params.classify_id = this.level_2;}
+                    if(this.level_1!=''&&this.level_2==''&&this.level_3==''){params.classify_id = this.level_1;}
+                    if(this.level_1==''&&this.level_2==''&&this.level_3==''){params.classify_id = 0;}
+                    params.article_id = this.addForm.article_id;
+                    params.title = this.addForm.title;
+                    params.author = this.addForm.author;
+                    params.company = this.addForm.company;
+                    params.copyright = this.addForm.copyright;
+                    params.project_name = this.addForm.project_name;
+                    params.keywords = this.addForm.keywords;
+                    params.sort = this.addForm.sort;
+                    params.is_look = this.addForm.is_look;
+                    params.integral = this.addForm.integral;
+                    params.pay_method = this.addForm.pay_method;
+                    params.project_number = this.addForm.project_number;
+                    params.image = this.addForm.image;
+                    params.is_check = this.addForm.is_check;
+                    params.is_pay = this.addForm.is_pay;
+
+                    params.research_nature = this.addForm.research_nature;
+                    params.job_title = this.addForm.job_title;
+                    params.start_time = this.addForm.start_time;
+                    params.end_time = this.addForm.end_time;
+                    params.chinese_abstract = this.addForm.chinese_abstract;
+                    params.english_abstract  = this.addForm.english_abstract ;
+                    params.english_keywords = this.addForm.english_keywords;
+                    params.end_summary = this.addForm.end_summary;
+                    params.annex  = this.addForm.annex ;
+                    params.project_report = this.addForm.project_report;
+                    params.faculty = this.addForm.faculty;
+                    params.project_funding = this.addForm.project_funding;
+
+                    params.column_id =1 ;
+                    params.content = this.getUEContent();
+                    this.$ajax.postu(urlA+'/college/article/updateArticle',params).then((res) => {
+                        if (res.msg == "success") {
+                        this.$message.success('更新成功');
+                        this.$router.push({ path: '/fund'});
+                        } else {
+                            this.$message({
+                            message: res.msg,
+                            type: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    if(this.level_1!=''&&this.level_2!=''&&this.level_3!=''){this.addForm.classify_id = this.level_3;}
+                    if(this.level_1!=''&&this.level_2!=''&&this.level_3==''){this.addForm.classify_id = this.level_2;}
+                    if(this.level_1!=''&&this.level_2==''&&this.level_3==''){this.addForm.classify_id = this.level_1;}
+                    if(this.level_1==''&&this.level_2==''&&this.level_3==''){this.addForm.classify_id = 0;}
+                    // if(this.level_1!=''&&this.level_2==''){this.addForm.classify_id = this.level_1;}
+                    // if(this.level_1==''&&this.level_2==''){this.addForm.classify_id = 0;}
+                    this.addForm.content = this.getUEContent();
+                    this.addForm.column_id =1;
+                    this.$ajax.postu(urlA+'/college/article/saveArticle',this.addForm).then((res) => {
+                        if (res.msg == "success") {
+                        this.$message.success('添加成功');
+                        this.$router.push({ path: '/fund'});
+                        } else {
+                            this.$message({
+                            message: res.msg,
+                            type: 'error'
+                            });
+                        }
+                    });
+                }
             
             },
+
+            handleRemove(file, fileList) {
+
+            },
+            handlePreview(file) {
+                console.log(file);   
+                if(file.response){
+                    window.open('http://valubio-static.oss-cn-shanghai.aliyuncs.com/article/'+file.response.data);
+                }else{
+                    window.open('http://valubio-static.oss-cn-shanghai.aliyuncs.com/article/'+file.name); 
+                }
+            },
+             handleExceed(files, fileList) {
+                this.$message.warning(`暂只支持上传一个文件`);
+            },
+             // 上传成功回调
+            upload_success:function(response, file, fileList){
+                console.log(response)
+                this.addForm.annex = response.data;
+                // var windowName = "/mnt/disha"+response.data;
+                // this.upLoad(windowName,file.name,0)
+            },
+            upload_success1:function(response, file, fileList){
+                console.log(response)
+                this.addForm.project_report = response.data;
+                // var windowName = "/mnt/disha"+response.data;
+                // this.upLoad(windowName,file.name,0)
+            },
+
+
+
+
            handleSwitch(row){
              console.log(row)
              this.switchValue = row;
@@ -407,7 +505,7 @@
 
 </script>
 
-<style scoped>
+<style>
     .handle-box {
         margin-bottom: 20px;
     }
@@ -454,4 +552,11 @@
        float:left;
        margin-right:5px;
    }
+   .upload .el-upload-list{float:left !important;}
+   .upload .el-upload{float:left !important;}
+   .upload .el-upload-list--picture .el-upload-list__item{height:35px !important;padding:10px !important;}
+   .upload .el-upload-list__item:first-child{margin-top:0px !important;margin-left:20px;}
+   .upload .el-upload-list--picture .el-upload-list__item.is-success .el-upload-list__item-name{line-height:15px !important;}
+   .upload a:hover{color:#ccc !important;background:#fff !important;}
+   .upload .el-upload-list__item .el-icon-close-tip{display:none !important;}
 </style>

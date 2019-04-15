@@ -45,11 +45,13 @@
                 </el-table-column>
                 <el-table-column prop="startTime" label="开始时间" align="center"></el-table-column>
                 <el-table-column prop="endTime" label="结束时间" align="center"></el-table-column>
+                <el-table-column prop="createTime" label="创建时间" align="center"></el-table-column>
                 <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
                         <el-button  type="text" icon="el-icon-edit" @click="handleEdit(scope.row)">编辑</el-button>
                        <!-- <el-button v-if="scope.row.status!='0'" type="text" icon="el-icon-tickets" @click="handleEdit(scope.row)">查看</el-button>-->
                         <el-button  type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button  type="text" icon="el-icon-tickets" @click="openCopy(scope.row)">复制拼团</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -63,9 +65,16 @@
                 </el-pagination>
             </div>
         </div>
-   
+         <!-- 拼团复制提示框 -->
+        <el-dialog title="提示" :visible="copyVisible" width="300px" center>
+            <div class="del-dialog-cnt">复制后会出现在列表第一行，是否继续？</div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="copyVisible = false">取 消</el-button>
+                <el-button type="primary" :loading="copyloading" @click="copyActivity">确 定</el-button>
+            </span>
+        </el-dialog>
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center @close="cancel">
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -92,10 +101,12 @@
                 editVisible: false,
                 delVisible: false,
                 listVisible:false,
+                copyVisible:false,//复制拼团
                 addFormVisible:false,//新增
                 addForm:[],
                 isView:false,//判断是否是查看和编辑
                 disabled:true,
+                copyloading:false,
                 title:'',
                 state:'',
                 form: {
@@ -105,7 +116,7 @@
                 exportVisible:false,
                 search_form:{},
                 startTime:'',
-                endTime:''
+                endTime:'',
             }
         },
         created() {
@@ -148,13 +159,36 @@
             //   this.$router.push({ name: '文章编辑',query: {id:row.article_id,str:'<p>123456789</p>'}})
             
             },
-            // 去添加和编辑文章
+            openCopy(row){
+            //   this.copyVisible = true;
+            //   this.idx = row.configId
+               this.$router.push({ path: '/groups_copy_editor',query: {id:row.configId}})
+            },
+            copyActivity(){
+                this.copyloading = true;
+                this.$ajax.postu(url+'groupBuyActivityBackendInterfaces.api?addCopyGroupBuyActivity',{groupBuyConfigId:this.idx}).then((res) => {
+                    if (res.status == "ok") {
+                       this.$message.success('复制成功');
+                       this.getData();
+                    } else {
+                        this.$message({
+                        message: res.error,
+                        type: 'error'
+                        });
+                    }
+                     this.copyVisible = false;
+                     this.copyloading = false;
+                });
+            },
+            // 去添加和编辑拼团
            goEditor(){
                this.$router.push({ path: '/groups_editor'})
             },
             cancel(){
                this.editVisible = false;
                this.pwVisible = false;
+               this.copyVisible = false;
+               this.delVisible=false;
             },
             handleDelete(index, row) {
                 this.idx = row.configId;
@@ -229,9 +263,6 @@
        float:left;
        margin-right:5px;
    }
-   .el-upload--text{
-       width:0px !important;
-       height:0px !important;
-   }
+ 
    .mr10{margin-bottom:10px;margin-right:10px;}
 </style>

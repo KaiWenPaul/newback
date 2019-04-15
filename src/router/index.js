@@ -93,11 +93,50 @@ export default new Router({
                     component: resolve => require(['../components/page/marketing/GroupsEditor.vue'], resolve),
                     meta: { title: '拼团编辑' }
                 },
+                //复制拼团
+                {
+                    path: '/groups_copy_editor',
+                    component: resolve => require(['../components/page/marketing/GroupsCopyEditor.vue'], resolve),
+                    meta: { title: '拼团复制编辑' }
+                },
                //产品管理
                 {
                 path: '/goods_upload',
                 component: resolve => require(['../components/page/goods/GoodsUpload.vue'], resolve),
                 meta: { title: '上传管理' }
+                },
+                //首页推荐
+                {
+                    path: '/labelOne',
+                    component: resolve => require(['../components/page/home/LabelOne.vue'], resolve),
+                    meta: { title: '一级标签' }
+                    },
+                {
+                        path: '/labelTwo',
+                        component: resolve => require(['../components/page/home/LabelTwo.vue'], resolve),
+                        meta: { title: '二级标签' }
+                },
+                // 推荐产品
+                {
+                    path: '/label_goods',
+                    component: resolve => require(['../components/page/home/LabelGoods.vue'], resolve),
+                    meta: { title: '标签产品' }
+                },
+                // 统计管理
+                {
+                    path: '/register_reward',
+                    component: resolve => require(['../components/page/count/RegisterReward.vue'], resolve),
+                    meta: { title: '用户领奖统计' }
+                },
+                {
+                    path: '/brand_statistic',
+                    component: resolve => require(['../components/page/statistic/BrandStatistic.vue'], resolve),
+                    meta: { title: '活动统计' }
+                },
+                {
+                    path: '/activity_statistic',
+                    component: resolve => require(['../components/page/statistic/ActivityStatistic.vue'], resolve),
+                    meta: { title: '促销统计' }
                 },
                 {
                     path: '/test',
@@ -113,7 +152,17 @@ export default new Router({
                 {
                     path: '/article',
                     component: resolve => require(['../components/page/article/Articles.vue'], resolve),
-                    meta: { title: '文章发布' }
+                    meta: { title: '栏目发布' }
+                },
+                {
+                    path: '/fund',
+                    component: resolve => require(['../components/page/article/Fund.vue'], resolve),
+                    meta: { title: '基金发布' }
+                },
+                {
+                    path: '/editor_fund',
+                    component: resolve => require(['../components/page/article/EditorFund.vue'], resolve),
+                    meta: { title: '基金编辑' }
                 },
                 {
                     path: '/editor_article',
@@ -124,8 +173,15 @@ export default new Router({
                 {
                     path: '/article_class',
                     component: resolve => require(['../components/page/article/ClassArticle.vue'], resolve),
-                    meta: { title: '文章分类' }
+                    meta: { title: '基金分类' }
                 },
+                {
+                    path: '/column_class',
+                    component: resolve => require(['../components/page/article/ClassColumn.vue'], resolve),
+                    meta: { title: '栏目分类' }
+                },
+
+
                 {
                     path: '/video_class',
                     component: resolve => require(['../components/page/article/ClassVideo.vue'], resolve),
@@ -147,11 +203,7 @@ export default new Router({
                     component: resolve => require(['../components/page/BaseTable.vue'], resolve),
                     meta: { title: '统计' }
                 },
-                {
-                    path: '/brand_statistic',
-                    component: resolve => require(['../components/page/statistic/BrandStatistic.vue'], resolve),
-                    meta: { title: '活动统计' }
-                },
+              
                 {
                     path: '/tabs',
                     component: resolve => require(['../components/page/Tabs.vue'], resolve),

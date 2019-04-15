@@ -7,38 +7,24 @@
         </div>
         <div class="container">
             <div class="handle-box" style="padding-left:300px;">
-                <el-steps :space="400" :active="active" finish-status="success">
-                    <el-step title="选择模板"></el-step>
-                    <el-step title="新建活动"></el-step>
-                    <el-step title="导入产品"></el-step>
-                </el-steps>
+              <!--<el-input v-model="labelGoodsId" placeholder="输入产品id" class="handle-input mr10"></el-input>
+              <el-button type="primary" icon="search" @click="getData()">搜索</el-button>-->
            </div>
            <div class="handle-box">
                 <el-button size="small" type="primary" @click="open">导入</el-button>
-                <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
+                 <!--<el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>-->
                 <el-button size="small" type="primary" @click="download">下载模板</el-button>
-              
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" align="center"></el-table-column>
-                <el-table-column prop="tstgoodsbrief.goodsId" label="商品ID" align="center"></el-table-column>
-                <el-table-column prop="tstgoodsbrief.brandId" label="品牌ID" align="center"></el-table-column>
-                <el-table-column prop="tstgoodsbrief.goodsName" label="商品名称" align="center"></el-table-column>
-                <el-table-column prop="tstgoodsbrief.goodsSku" label="商品货号" align="center"></el-table-column>
-                <el-table-column prop="activityPrice" label="活动价格" align="center"></el-table-column>
-                <el-table-column prop="classifiedLabel" label="分类标签" align="center"></el-table-column>
-                <el-table-column label="有无积分">
-                 <template slot-scope="scope">
-                        <span v-if="scope.row.haveIntegral == '0'">无</span>  
-                         <span v-else-if="scope.row.haveIntegral == '1'">有</span>
-                         <span v-else>{{scope.row.haveIntegral}}</span>
-                 </template>
-                </el-table-column>
+                   <!--<el-table-column type="selection" width="55" align="center"></el-table-column>-->
+                <el-table-column prop="goodsId" label="商品ID" align="center"></el-table-column>
+                <el-table-column prop="goods_name" :show-overflow-tooltip="true" label="商品名称" align="center"></el-table-column>
+                <el-table-column prop="brand_name" label="品牌名称" align="center"></el-table-column>
+                <el-table-column prop="goods_sku" label="商品货号" align="center"></el-table-column>
               
                 <el-table-column label="操作" width="180" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                           <!--<el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -59,7 +45,7 @@
            <div style="width:100%;height:100px;">
               <form  id="form" enctype="multipart/form-data">
                 <!--<input type="text" value="1" v-model="id">-->
-                <div style="width:100%;line-height:30px;"><input type="file" @change="getFile($event)"></div>
+                <div style="width:100%;line-height:30px;"><input type="file" id="test" @change="getFile($event)"></div>
                 <div style="width:100%;margin-top:20px;"> 
                   <button @click="submitForm($event)" style="width:70px;height:30px;text-align:center;background:#409EFF;border:none;border-radius:3px;color:#fff;">提交</button>
                    <button @click="cancel" style="width:70px;height:30px;text-align:center;background:#409EFF;border:none;border-radius:3px;color:#fff;">取消</button>
@@ -71,21 +57,17 @@
         <el-dialog title="编辑" :visible="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="100px">
                 <el-form-item label="商品ID">
-                    <el-input v-model="form.id"></el-input>
+                    <el-input v-model="form.goodsId"></el-input>
                 </el-form-item>
-                <el-form-item label="活动价格">
-                    <el-input v-model="form.activityPrice"></el-input>
+                <el-form-item label="商品名称">
+                    <el-input v-model="form.goods_name"></el-input>
                 </el-form-item>
-                <el-form-item label="分类">
-                    <el-input v-model="form.classifiedLabel"></el-input>
+                <el-form-item label="品牌名称">
+                    <el-input v-model="form.brand_name"></el-input>
                 </el-form-item>
-                <el-form-item label="有无积分">
-                        <el-select v-model="form.haveIntegral" placeholder="请选择">
-                            <el-option key="1" label="有" value="1"></el-option>
-                            <el-option key="0" label="无" value="0"></el-option>
-                        </el-select>
+                <el-form-item label="产品货号">
+                    <el-input v-model="form.goods_sku"></el-input>
                 </el-form-item>
-
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
@@ -124,13 +106,13 @@
                 page:1,
                 total:0,
                 form:{
-                   activityPrice:'',
-                   classifiedLabel:'',
-                   haveIntegral:'',
-                   id:'',
-                   addactivityId:'',
-                   googsId:''
-                }
+                   goods_name:'',
+                   goodsId:'',
+                   brand_name:'',
+                   goods_sku:'',
+                   labelGoodsId:'',
+                },
+                labelGoodsId:''
             }
         },
         created() {
@@ -145,9 +127,10 @@
                  var filter = {};
                 //  filter.pageNum  = this.page;
                 //  filter.pageSize=10;
-                 filter.addactivityId =this.addactivityId;
-                 this.$ajax.postu(url+'distributor/tstdistributorgoods.api?selectWhole',filter).then((res) => {
-                    if (res.description == "success") {
+                 filter. labelTwoId =this.$route.query.id;
+                if(this.labelGoodsId!=''){filter.labelGoodsId = this.labelGoodsId;}
+                 this.$ajax.postu(url+'HomeLabelGoods.api?selectByPrimaryKey',filter).then((res) => {
+                    if (res.status == "ok") {
                        this.tableData = res.data;
                     //    this.total = res.data.total;
                     } else {
@@ -178,26 +161,30 @@
             cancel(){
                 this.dialogVisible = false;
                 this.delVisible = false;
+                $('#test').val('')
             },
             //下载模板
             download(){
-              location.href=imgUrl+'distributor/resolve/download';
+             window.open(downUrl+"/excel/uploadlabegoods.xlsx")
+            //   window.open(imgUrl+'/HomeLabelGoods.api?download');
             },
             submitForm(event) {
                 var self =this;
                 event.preventDefault();
                 let formData = new FormData();
-                formData.append('addactivityId', this.addactivityId);
+                formData.append('labelTwoId', this.$route.query.id);
                 formData.append('file', this.file);
                 let config = {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 }
-                this.$axios.post(imgUrl+'distributor/resolve/upload', formData, config).then(function(res) {
-                    if(res.data.description === 'success') {
+                this.$axios.post(imgUrl+'HomeLabelGoods.api?upload', formData, config).then(function(res) {
+                    if(res.data.status == 'ok') {
                         /*这里做处理*/
+                        self.$message.success('上传成功');
                         self.dialogVisible=false;
+                        $('#test').val('')
                         self.getData();
                         console.log(123)
                     }
@@ -242,13 +229,13 @@
                 });
             },
             handleDelete(index, row) {
-                this.idx = row.id;
+                this.idx = row.labelGoodsId;
                 this.delVisible = true;
             },
-              // 确定删除
+            // 确定删除
             deleteRow(){
-                this.$ajax.postu(url+'distributor/tstdistributorgoods.api?delete',{id:this.idx}).then((res) => {
-                    if (res.description == "success") {
+                this.$ajax.postu(url+'HomeLabelGoods.api?deleteByPrimaryKey',{labelGoodsId:this.idx}).then((res) => {
+                    if (res.status == "ok") {
                        this.$message.success('删除成功');
                        this.delVisible = false;
                        this.getData();

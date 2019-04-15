@@ -52,7 +52,7 @@
             </div>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog :title="title" :visible.sync="editVisible" width="50%">
+        <el-dialog :title="title" :visible="editVisible" width="50%">
              <el-form ref="form" :model="form" label-width="100px">
                     <el-form-item label="账号"><el-input style="width:210px;" v-model="form.username" :disabled="isAdd"></el-input></el-form-item>
                     <el-form-item label="密码" v-if="isAdd===false"><el-input style="width:210px;" type="password" v-model="form.password"></el-input></el-form-item>
@@ -75,7 +75,7 @@
                 </el-form>
         </el-dialog>
          <!-- 修改密码 -->
-        <el-dialog :title="title" :visible.sync="pwVisible" width="50%">
+        <el-dialog :title="title" :visible="pwVisible" width="50%">
              <el-form ref="form"label-width="100px">
                     <el-form-item label="新密码"><el-input style="width:200px;" type="password" v-model="password"></el-input></el-form-item>
                     <el-form-item>
@@ -86,7 +86,7 @@
         </el-dialog>
 
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>

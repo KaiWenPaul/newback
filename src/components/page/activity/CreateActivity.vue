@@ -31,7 +31,7 @@
                             <el-date-picker  type="datetime"value-format="yyyy-MM-dd HH:mm:ss"  placeholder="结束日期" v-model="form.endTime" style="width: 100%;"></el-date-picker>
                         </el-col>
                     </el-form-item>
-                    <el-form-item label="活动类型">
+                   <!-- <el-form-item label="活动类型">
                         <el-select
                             placeholder="请选择"
                             value-key="id"
@@ -43,7 +43,7 @@
                                 :value="item.typeId">
                             </el-option>
                         </el-select>
-                    </el-form-item>
+                    </el-form-item>-->
                   
                     <el-form-item label="定时开启">
                         <el-col :span="5">
@@ -221,9 +221,16 @@
                         <el-radio v-model="form.activeState" label="0">开启</el-radio>
                         <el-radio v-model="form.activeState" label="1">关闭</el-radio>
                     </el-form-item>
-                     <el-form-item label="发布至">   
+                    <!-- <el-form-item label="发布至">   
                         <el-radio v-model="form.releaseTo" label="0">商城</el-radio>
                         <el-radio v-model="form.releaseTo" label="1">经销商端</el-radio>
+                    </el-form-item>-->
+                      <el-form-item label="发布至">   
+                        <el-checkbox-group v-model="checkList">
+                            <el-checkbox label="0">商城</el-checkbox>
+                            <el-checkbox label="1">研驻宝B端</el-checkbox>
+                            <el-checkbox label="3">研驻宝C端</el-checkbox>
+                        </el-checkbox-group>
                     </el-form-item>
                 
                     <el-form-item>
@@ -275,26 +282,26 @@
                 loadImg:imgUrl+"distributor/uploadimg/fileUpload",
                 // 默认背景颜色
                 predefineColors:[
-                    '#2ea4be',
-                    '#ff8c00',
-                    '#ffd700',
-                    '#90ee90',
-                    '#00ced1',
-                    '#1e90ff',
-                    '#c71585',
-                    'rgba(255, 69, 0, 0.68)',
-                    'rgb(255, 120, 0)',
-                    'hsv(51, 100, 98)',
-                    'hsva(120, 40, 94, 0.5)',
-                    'hsl(181, 100%, 37%)',
-                    'hsla(209, 100%, 56%, 0.73)',
-                    '#c7158577'
-                    ]
+                   '#EB4D72',
+                    '#29A1BC',
+                    '#5C90CC',
+                    '#8086DB',
+                    '#AB81DC',
+                    '#C373C3',
+                    '#EC68A9',
+                    '#DA767F',
+                    '#A38C3B',
+                    '#7E973A',
+                    '#5EA24C',
+                    '#41A365',
+                    '#19A98B',
+                    ],
+                checkList:[],
                
             }
         },
         created() {
-             this.getType();
+            
         },
         mounted(){
           this.restaurants = this.loadAll();
@@ -327,10 +334,11 @@
                 params.activeState = this.form.activeState;
                 params.endTime = this.form.endTime;
                 params.name = this.form.name;
-                params.releaseTo = this.form.releaseTo;
+                // params.releaseTo = this.form.releaseTo;
+                params.releaseTo = this.checkList.join(',');
                 params.startTime = this.form.startTime;
                 params.timingTime = this.form.timingTime;
-                params.typeId = this.form.typeId;
+                // params.typeId = this.form.typeId;
                 params.webImage = this.form.webImage;
                 params.moveImage = this.form.moveImage;
                 params.headImagePc = this.form.headImagePc;
@@ -349,8 +357,8 @@
                 this.$ajax.postu(url+"/distributor/tstdistributoraddactivity.api?insert",params).then((res) => {
                     if (res.description == "success") {
                          if(this.id=='4'){
-                        //    this.$router.push({ path: '/activity'})  
-                        this.$router.go(-1);
+                           this.$router.push({ path: '/activity'})  
+                        // this.$router.go(-1);
                          }else{
                            this.$router.push({ path: '/export_goods',query:{id:res.data}})
                          }

@@ -7,8 +7,8 @@
         </div>
         <div class="container">
               <div class="handle-box">
-              <el-input v-model="video_id" placeholder="输入视频编号" class="handle-input mr10" @keyup.enter.native="getData"></el-input>
-              <el-input v-model="title" placeholder="输入视频名称" class="handle-input mr10" @keyup.enter.native="getData"></el-input>
+              <el-input v-model="video_id" placeholder="输入视频编号" class="handle-input mr10" @keyup.enter.native="getData" style="width:300px;"></el-input>
+              <el-input v-model="title" placeholder="输入视频名称" class="handle-input mr10" @keyup.enter.native="getData" style="width:300px;"></el-input>
               <!-- <el-input v-model="corporateName" placeholder="输入公司名称" class="handle-input mr10"></el-input>
               <el-date-picker type="date" placeholder="请选择日期" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>-->
               <el-select v-model="check_state" placeholder="状态" class="handle-select mr10" @keyup.enter.native="getData">
@@ -74,7 +74,7 @@
             </div>
         </div>
     <!--导入提示框-->
-      <el-dialog title="上传文章" :visible.sync="exportVisible" width="30%">
+      <el-dialog title="上传文章" :visible="exportVisible" width="30%" @close="cancel">
            <el-upload
             :action="action"
             :on-preview="handlePreview"
@@ -95,7 +95,7 @@
             </span>
         </el-dialog>
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -103,7 +103,7 @@
             </span>
         </el-dialog>
           <!-- 批量删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delallVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delallVisible" width="300px" center @close="cancel">
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delallVisible = false">取 消</el-button>
@@ -207,6 +207,9 @@ import UE from '../../common/Idtor.vue';
             cancel(){
                this.editVisible = false;
                this.pwVisible = false;
+               this.delVisible =false;
+               this.exportVisible= false;
+               this.delallVisible=false;
             },
             handleDelete(index, row) {
                 this.idx = row.video_id;
@@ -352,10 +355,7 @@ import UE from '../../common/Idtor.vue';
        float:left;
        margin-right:5px;
    }
-   .el-upload--text{
-       width:0px !important;
-       height:0px !important;
-   }
+   
    .el-upload-list__item-name:hover{
        background:#fff !important;
    }

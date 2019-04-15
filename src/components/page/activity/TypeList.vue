@@ -40,7 +40,7 @@
           
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog :title="title" :visible.sync="editVisible" width="50%">
+        <el-dialog :title="title" :visible="editVisible" width="50%" @close="cancel">
              <el-form ref="form" :model="form" label-width="100px">
                     <el-form-item label="标签名"><el-input style="width:210px;" v-model="form.name"></el-input></el-form-item>
                     <el-form-item label="类型">
@@ -67,7 +67,7 @@
         
 
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center @close="cancel">
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -222,6 +222,7 @@
             cancel(){
                this.editVisible = false;
                this.pwVisible = false;
+               this.delVisible =false;
             },
             handleDelete(index, row) {
                 this.idx = row.id;

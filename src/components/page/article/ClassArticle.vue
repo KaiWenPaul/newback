@@ -11,12 +11,13 @@
               <el-input v-model="classify_id" placeholder="输入分类编号" class="handle-input mr10"></el-input>
              <!-- <el-input v-model="corporateName" placeholder="输入公司名称" class="handle-input mr10"></el-input>
               <el-date-picker type="date" placeholder="请选择日期" v-model="form.date" value-format="yyyy-MM-dd"></el-date-picker>-->
+              <label>状态:</label>
               <el-select v-model="check_state" placeholder="状态" class="handle-select mr10">
-                    <el-option key="" label="全部" value=""></el-option>
+                    <el-option key="3" label="全部" value=""></el-option>
                     <el-option key="0" label="开启" value="0"></el-option>
                     <el-option key="1" label="关闭" value="1"></el-option>
                 </el-select>
-              <el-button type="primary" icon="search" @click="getData()">搜索</el-button>
+              <el-button type="primary" icon="search" @click="search">搜索</el-button>
             </div>
             <div class="handle-box add">
              <el-button type="primary" icon="el-icon-edit" class="handle-del mr10" @click="showAddDialog">新增</el-button>
@@ -64,9 +65,9 @@
         </div>
         
         <!-- 编辑页面-->
-        <el-dialog title="编辑分类" :visible.sync="editFormVisible" :close-on-click-modal="false">
+        <el-dialog title="编辑分类" :visible="editFormVisible" :close-on-click-modal="false" @close="cancel">
             <el-form :model="editForm" label-width="100px" ref="editForm">
-            <el-form-item label="栏目分类名称">
+            <el-form-item label="文章分类名称">
                 <el-input v-model="editForm.classify_name" auto-complete="off" placeholder="1-10个字"></el-input>
             </el-form-item>
 
@@ -79,6 +80,7 @@
                 :value="item.classify_id">
                </el-option>
               </el-select>
+
                <span style="margin:0 10px;">二级分类</span>
                <el-select v-model="level_2" :disabled="disabledB" placeholder="请选择">
                 <el-option
@@ -119,9 +121,9 @@
         </el-dialog>
 
         <!--新增界面-->
-        <el-dialog title="新增分类" :visible.sync="addFormVisible" :close-on-click-modal="false">
+        <el-dialog title="新增分类" :visible="addFormVisible" :close-on-click-modal="false" @close="cancel">
             <el-form :model="addForm" label-width="100px" ref="addForm">
-            <el-form-item label="栏目分类名称">
+            <el-form-item label="文章分类名称">
                 <el-input v-model="addForm.classify_name" auto-complete="off" placeholder="1-10个字"></el-input>
             </el-form-item>
             <el-form-item label="一级分类">
@@ -172,7 +174,7 @@
         </el-dialog>
        
         <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
+        <el-dialog title="提示" :visible="delVisible" width="300px" center @close="cancel">
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="delVisible = false">取 消</el-button>
@@ -192,6 +194,7 @@
                 total:0,
                 multipleSelection: [],
                 check_state: '',
+                column_id:'',
                 del_list: [],
                 is_search: false,
                 editVisible: false,
@@ -219,11 +222,12 @@
                 articleId:'',
                 isUp:false,
                 delId:'',
-                testData:{}
+                testData:{},
+                parentId:false
             }
         },
         created() {
-            this.getData(0);
+            this.getData(0,1);
             this.getClass(0,1,0);
         },
         methods: {
@@ -233,38 +237,54 @@
             // 分页导航
             handleCurrentChange(val) {
                 this.cur_page = val;
-                this.getData();
+                this.getData(0,this.cur_page);
+            },
+            search(){
+                if(this.classify_id!=''){
+                  this.getData(this.classify_id,1)
+                }else{
+                     this.getData(0,1)
+                }
+               
             },
             // 获取列表数据
-           getData(arr,crr) {
+           getData(arr,brr) {
                 var filter = {};
-                filter.pageNum   = this.cur_page;
+                filter.pageNum   = brr;
                 filter.pageSize =10;
-                filter.parent_id = arr;
+                filter.column_id =1 ;
                 if(this.classify_name!=''){filter.classify_name=this.classify_name}
-                if(this.check_state!=''){
-                    if(this.check_state==3){
-                       filter.is_check='' 
-                    }else{
-                       filter.is_check=this.check_state
-                    }
-                    }
-                if(this.classify_id!=''){filter.classify_id=this.classify_id}
+                
+                if(this.check_state==3){
+                    filter.is_check='' 
+                }else{
+                    filter.is_check=this.check_state
+                }
+                    
+                if(this.classify_id!=''){filter.classify_id=this.classify_id}else{  filter.parent_id = arr;}
                    this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassifyList', filter).then((res) => {
                     if (res.msg == "success") {
                         if(res.data.list!=''){
                            this.tableData = res.data.list;
                            this.total = res.data.total;
+                           if(res.data.list.length==1){
+                               console.log(123)
+                               if(res.data.list[0].level=='1'){localStorage.setItem('parentId',0)}
+                               else if(res.data.list[0].level=='2'){localStorage.setItem('parentId',0)}
+                               else if(res.data.list[0].level=='3'){localStorage.setItem('parentId',res.data.list[0].level_1)}
+                               else if(res.data.list[0].level=='4'){localStorage.setItem('parentId',res.data.list[0].level_2)}
+                               this.parentId = true;
+                           }
                            if(res.data.list[0].level=='2'||res.data.list[0].level=='3'){this.isUp=true}else{this.isUp=false}
                         }else{
-                            if(crr){
-                               if(crr.level=='3'){this.getData(crr.level_1)}else {this.getData(0)}
-                            }else{
-                               this.$message({
-                                message:'没有东西了哟',
-                                type: 'warning'
-                                });
-                            }
+                            // if(crr){
+                            //    if(crr.level=='3'){this.getData(crr.level_1)}else {this.getData(0)}
+                            // }else{
+                            //    this.$message({
+                            //     message:'没有东西了哟',
+                            //     type: 'warning'
+                            //     });
+                            // }
                            
                             
                         }
@@ -280,6 +300,7 @@
             getClass(arr,brr,crr) {
                 var filter = {};
                 filter.parent_id =arr;
+                filter.columnId =1 ;
                 this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassify', filter).then((res) => {
                     if (res.msg == "success") {
                         if(brr=='1'){
@@ -305,6 +326,7 @@
                 filter.pageNum   = 1;
                 filter.pageSize =10;
                 filter.parent_id = arr;
+                filter.column_id =1 ;
                 this.$ajax.postu(urlA+'/college/articleClassify/getArticleClassifyList', filter).then((res) => {
                     if (res.msg == "success") {
                         if(res.data.list!=''){
@@ -330,6 +352,7 @@
                 var filter = {};
                 filter.pageNum   = 1;
                 filter.pageSize =10;
+                filter.column_id =1 ;
                 if(row.level=='2'){
                    filter.parent_id = 0;
                 }else if(row.level=='3'){
@@ -367,6 +390,7 @@
                 if(this.level_1==''&&this.level_2==''){
                     this.addForm.parent_id = 0;
                 }
+                this.addForm.column_id = 1;
                 if(this.delivery=true){this.addForm.is_check=0;}else{this.addForm.is_check=1;}
                 this.$ajax.postu(urlA+'/college/articleClassify/saveArticleClassify',this.addForm).then((res) => {
                     if (res.msg == "success") {
@@ -375,7 +399,8 @@
                             type: 'success'
                         });
                         this.addFormVisible = false;
-                        this.getData(0);
+                        this.getData(this.addForm.parent_id,1);
+                        this.getClass(0,1,0);
                     } else {
                         this.$message({
                         message: res.msg,
@@ -435,7 +460,8 @@
                             type: 'success'
                         });
                         this.editFormVisible = false;
-                        this.getData(params.parent_id);
+                        this.getData(params.parent_id,1);
+                        this.getClass(0,1,0);
                     } else {
                         this.$message({
                         message: res.msg,
@@ -449,11 +475,12 @@
                this.addFormVisible = false;
                this.pwVisible = false;
                this.editFormVisible = false;
+               this.delVisible = false;
             },
             handleDelete(index, row) {
                 this.idx = row.classify_id;
                 this.delVisible = true;  
-                if(row.level=='2'){this.delId=row.level_1}else if(row.level=='3'){this.delId=row.level_2};
+                if(row.level=='2'){this.delId=row.level_1}else if(row.level=='3'){this.delId=row.level_2}else if(row.level=='1'){this.delId=0};
                 this.testData = row;
             },
              // 确定删除
@@ -462,7 +489,12 @@
                     if (res.msg == "success") {
                        this.$message.success('删除成功');
                        this.delVisible = false;
-                       this.getData(this.delId,this.testData);
+                       console.log(this.parentId==true)
+                       if(this.parentId==true){
+                         this.getData(localStorage.getItem('parentId'),1);   
+                       }else{
+                         this.getData(this.delId,1);
+                       }
                     } else {
                         this.$message({
                         message: res.msg,
